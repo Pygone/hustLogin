@@ -1,10 +1,31 @@
-class Transcript:
-    def __init__(self, data, query: str = None):
+import json
+
+import fake_useragent
+import requests
+from requests.structures import CaseInsensitiveDict
+
+
+class Transcript(requests.Session):
+    def __init__(self, url, query: str = None):
+        super().__init__()
+        self.data = None
         self.publicSets = None
         self.mustSets = None
-        self.data = data
+        self.url = url
         self.query = query
+        self.get_data()
         self.init()
+
+    def get_data(self):
+        self.headers = CaseInsensitiveDict({"User-Agent": fake_useragent.UserAgent().chrome})
+        self.get(self.url)
+        res = self.get("https://cjd.hust.edu.cn/cas/client/validateLogin" + self.url[self.url.find(
+            '?'):] + "&service=https://cjd.hust.edu.cn/bks/")
+        self.cookies.set("X-Access-Token", res.json()["result"]["token"])
+        self.headers["X-Access-Token"] = res.json()["result"]["token"]
+        res = self.get(
+            "https://cjd.hust.edu.cn/student/user/course_info?pageNo=1&pageSize=100&sort=create_time&order=desc").text
+        self.data = json.loads(res)
 
     def init(self):
         sets = self.data["result"]["score"]["records"]

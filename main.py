@@ -12,4 +12,4 @@ if __name__ == "__main__":
         print("Tesseract 尚未安装完善")
         sys.exit(-1)
     ex = LoginSession(userId=userId, password=password)
-    print(ex.transcript("新生实践课"))
+    print(ex.transcript("xxx"))

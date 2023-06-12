@@ -6,7 +6,9 @@ import fake_useragent
 import requests
 from requests.structures import CaseInsensitiveDict
 
+from Operation.Badminton import Badminton
 from Operation.Course import Course
+from Operation.CourseAttack import CourseAttack
 from Operation.Transcript import Transcript
 from util import captcha
 from util.rsaEncoder import rsaEncoder
@@ -68,27 +70,21 @@ class LoginSession(requests.Session):
         except:
             self.headers = CaseInsensitiveDict({"User-Agent": user_agent})
             self.cookies.clear()
-            return self.options(operation)
-        if operation == "wsxk":
-            return url
-        if operation == "cjd":
-            with requests.session() as Session:
-                Session.headers = CaseInsensitiveDict({"User-Agent": fake_useragent.UserAgent().chrome})
-                Session.get(url)
-                res = Session.get("https://cjd.hust.edu.cn/cas/client/validateLogin" + url[url.find(
-                    '?'):] + "&service=https://cjd.hust.edu.cn/bks/")
-                Session.cookies.set("X-Access-Token", res.json()["result"]["token"])
-                Session.headers["X-Access-Token"] = res.json()["result"]["token"]
-                res = Session.get(
-                    "https://cjd.hust.edu.cn/student/user/course_info?pageNo=1&pageSize=100&sort=create_time&order=desc").text
-                data = json.loads(res)
-                return data
+            return self.__operate(operation)
+        return url
 
     def course(self, course: dict, time: str, function: str = "Attack"):
-        course = Course(self.__operate("wsxk"), self.userId, course, function)
+        course = CourseAttack(self.__operate("wsxk"), self.userId, course, function)
         course.run(time)
 
     def transcript(self, query: str = None):
         transcript = Transcript(self.__operate("cjd"), query)
         res = transcript.run()
         return res
+
+    def kb(self):
+        return Course(self.__operate("kb")).Courses
+
+    def badminton(self, partner: list, Date: str, start_time=None, cd: int = 1):
+        badminton = Badminton(self.__operate("badminton"), partner, Date, start_time, cd)
+        return badminton.run()
