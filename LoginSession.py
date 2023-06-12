@@ -35,8 +35,8 @@ class LoginSession(requests.Session):
         self.code = captcha.deCaptcha(captchaContent.raw)
 
     def get_rsa(self):
-        rsa = self.post("https://pass.hust.edu.cn/cas/rsa").text
-        self.rsa = json.loads(rsa)['publicKey']
+        rsa = self.post("https://pass.hust.edu.cn/cas/rsa").json()
+        self.rsa = rsa['publicKey']
         self.RSAuserId, self.RSApassword = rsaEncoder(self.userId, self.password, self.rsa).encode()
 
     def get_lt(self):
@@ -82,7 +82,7 @@ class LoginSession(requests.Session):
         res = transcript.run()
         return res
 
-    def kb(self):
+    def Schedule(self):
         return Course(self.__operate("kb")).Courses
 
     def badminton(self, partner: list, Date: str, start_time=None, cd: int = 1):
