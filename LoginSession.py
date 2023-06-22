@@ -1,5 +1,6 @@
 import json
 import re
+import time
 from random import random
 
 import fake_useragent
@@ -88,3 +89,17 @@ class LoginSession(requests.Session):
     def badminton(self, partner: list, Date: str, start_time=None, cd: int = 1):
         badminton = Badminton(self.__operate("badminton"), partner, Date, start_time, cd)
         return badminton.run()
+
+    def xyk(self, val, password):
+        url = self.__operate("xyk")
+        with requests.session() as session:
+            session.get(url)
+            res = session.get("http://ecard.m.hust.edu.cn/wechat-web/ChZhController/ChongZhiurl.html")
+            cardno = re.search('id="cardno" value="(.*)"/>', res.text).group(1)
+            res = session.post("http://ecard.m.hust.edu.cn/wechat-web/ChZhController/ChongZhi.html", data={
+                "jsoncallback": "jsonp" + str(int(time.time() * 1000)),
+                "value": str(val) + "," + str(password),
+                "cardno": 279760,
+                "acctype": "1"
+            })
+            return re.search('"errmsg":"(.*?)"', res.text).group(1)
