@@ -99,7 +99,7 @@ class LoginSession(requests.Session):
             res = session.post("http://ecard.m.hust.edu.cn/wechat-web/ChZhController/ChongZhi.html", data={
                 "jsoncallback": "jsonp" + str(int(time.time() * 1000)),
                 "value": str(val) + "," + str(password),
-                "cardno": 279760,
+                "cardno": cardno,
                 "acctype": "1"
             })
             return re.search('"errmsg":"(.*?)"', res.text).group(1)
