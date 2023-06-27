@@ -1,10 +1,8 @@
-import time
-
 from PIL import Image, ImageOps
 from pytesseract import image_to_string
 
 
-# 挪用libhustpass
+# 借用libhustpass
 
 def depoint(img):
     pic_data = img.load()
