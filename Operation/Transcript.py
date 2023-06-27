@@ -1,29 +1,27 @@
 import json
 
-import fake_useragent
-import requests
-from requests.structures import CaseInsensitiveDict
+from LoginSession import LoginSession
 
 
-class Transcript(requests.Session):
-    def __init__(self, url, query: str = None):
+class Transcript:
+    def __init__(self, loginSession: LoginSession, query: str = None):
         super().__init__()
+        self.loginSession = loginSession
         self.data = None
         self.publicSets = None
         self.mustSets = None
-        self.url = url
+        self.url = self.loginSession.post("https://pass.hust.edu.cn/cas/login?service=https://cjd.hust.edu.cn/bks/",
+                                          allow_redirects=False).headers['Location']
         self.query = query
         self.get_data()
         self.init()
 
     def get_data(self):
-        self.headers = CaseInsensitiveDict({"User-Agent": fake_useragent.UserAgent().chrome})
-        self.get(self.url)
-        res = self.get("https://cjd.hust.edu.cn/cas/client/validateLogin" + self.url[self.url.find(
+        res = self.loginSession.get("https://cjd.hust.edu.cn/cas/client/validateLogin" + self.url[self.url.find(
             '?'):] + "&service=https://cjd.hust.edu.cn/bks/")
-        self.cookies.set("X-Access-Token", res.json()["result"]["token"])
-        self.headers["X-Access-Token"] = res.json()["result"]["token"]
-        res = self.get(
+        self.loginSession.cookies.set("X-Access-Token", res.json()["result"]["token"])
+        self.loginSession.headers["X-Access-Token"] = res.json()["result"]["token"]
+        res = self.loginSession.get(
             "https://cjd.hust.edu.cn/student/user/course_info?pageNo=1&pageSize=100&sort=create_time&order=desc").text
         self.data = json.loads(res)
 

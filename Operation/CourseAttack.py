@@ -6,10 +6,9 @@ import time
 from datetime import datetime
 
 import aiohttp
-import fake_useragent
-import requests
 from requests import JSONDecodeError
-from requests.structures import CaseInsensitiveDict
+
+from LoginSession import LoginSession
 
 console_handler = logging.StreamHandler(sys.stdout)
 console_handler.setFormatter(logging.Formatter(
@@ -18,14 +17,12 @@ console_handler.setFormatter(logging.Formatter(
 ))
 console_handler.setLevel(logging.INFO)
 logging.basicConfig(level=logging.INFO, handlers=[console_handler], )
-user_agent = fake_useragent.UserAgent().chrome
 
 
-class CourseAttack(requests.Session):
-    def __init__(self, url: str, userId, course: dict, function: str = "Attack"):
+class CourseAttack():
+    def __init__(self, loginSession: LoginSession, userId, course: dict, function: str = "Attack"):
         super().__init__()
-        self.url = url
-        self.headers = CaseInsensitiveDict({"User-Agent": user_agent})
+        self.loginSession = loginSession
         self.init()
         self.function = function
         self.userId = userId
@@ -38,7 +35,7 @@ class CourseAttack(requests.Session):
 
     async def Postmethod(self, url, data, course, teacherNum):
         async with aiohttp.ClientSession() as session:
-            async with session.post(url=url, data=data, headers=self.headers) as response:
+            async with session.post(url=url, data=data, headers=self.loginSession.headers) as response:
                 assert response.status == 200
                 json = await response.json()
                 if json["code"] == "0":
@@ -48,7 +45,7 @@ class CourseAttack(requests.Session):
 
     async def getclassId(self, url, data, course):
         async with aiohttp.ClientSession() as session:
-            async with session.post(url=url, data=data, headers=self.headers) as response:
+            async with session.post(url=url, data=data, headers=self.loginSession.headers) as response:
                 assert response.status == 200
                 json = await response.json()
                 courseList = []
@@ -59,8 +56,8 @@ class CourseAttack(requests.Session):
 
     def GetCourse(self):
         data = {"page": 1, "limit": 10, "fzxkfs": "", "xkgz": 1}
-        res = self.post(url="http://wsxk.hust.edu.cn/zyxxk/Stuxk/getXsFaFZkc", data=data,
-                        allow_redirects=False)
+        res = self.loginSession.post(url="http://wsxk.hust.edu.cn/zyxxk/Stuxk/getXsFaFZkc", data=data,
+                                     allow_redirects=False)
         try:
             res_json = res.json()
         except JSONDecodeError:
@@ -113,18 +110,19 @@ class CourseAttack(requests.Session):
                 data = {"page": 1, "limit": 10, "fzid": self.requestList[course][2],
                         "kcbh": self.requestList[course][1],
                         "sfid": self.userId, "faid": self.requestList[course][0], "id": self.requestList[course][0]}
-                res = self.post(url="http://wsxk.hust.edu.cn/zyxxk/Stuxk/getFzkt", data=data)
+                res = self.loginSession.post(url="http://wsxk.hust.edu.cn/zyxxk/Stuxk/getFzkt", data=data)
                 resjson = res.json()
                 for i in resjson["data"]:
                     if i["XM"] in self.course[course] and i["KTRS"] < i["KTRL"]:
-                        response = self.post(url="http://wsxk.hust.edu.cn/zyxxk/Stuxk/addStuxkIsxphx", data={
-                            "ktbh": i["KTBH"],
-                            "xqh": self.XQH,
-                            "kcbh": self.requestList[course][1],
-                            "fzid": self.requestList[course][2],
-                            "faid": self.requestList[course][0],
-                            "sfid": self.userId
-                        })
+                        response = self.loginSession.post(url="http://wsxk.hust.edu.cn/zyxxk/Stuxk/addStuxkIsxphx",
+                                                          data={
+                                                              "ktbh": i["KTBH"],
+                                                              "xqh": self.XQH,
+                                                              "kcbh": self.requestList[course][1],
+                                                              "fzid": self.requestList[course][2],
+                                                              "faid": self.requestList[course][0],
+                                                              "sfid": self.userId
+                                                          })
                         json = response.json()
                         if json["code"] == "0":
                             logging.info(f"学号为{self.userId}的同学, 您已抢到{course}:{i['XM']}")
@@ -168,7 +166,7 @@ class CourseAttack(requests.Session):
         return params
 
     def init(self):
-        self.get(self.url)
-        res = self.get("http://wsxk.hust.edu.cn/xklogin.jsp?url=http://wsxk.hust.edu.cn/zyxxk/nlogin").text
+        self.loginSession.get("http://wsxk.hust.edu.cn/hustpass2.action")
+        res = self.loginSession.get("http://wsxk.hust.edu.cn/xklogin.jsp?url=http://wsxk.hust.edu.cn/zyxxk/nlogin").text
         params = self.analyseHtml(res)
-        self.post("http://wsxk.hust.edu.cn/zyxxk/nlogin", data=params)
+        self.loginSession.post("http://wsxk.hust.edu.cn/zyxxk/nlogin", data=params)

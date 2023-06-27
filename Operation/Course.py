@@ -1,13 +1,14 @@
 import re
 
-import requests
 from bs4 import BeautifulSoup
 
+from LoginSession import LoginSession
 
-class Course(requests.Session):
-    def __init__(self, url):
+
+class Course():
+    def __init__(self, loginSession: LoginSession):
         super().__init__()
-        self.url = url
+        self.loginSession = loginSession
         self.Courses = {}
         self.func()
 
@@ -29,8 +30,7 @@ class Course(requests.Session):
         self.Courses[courseName] = Course
 
     def func(self):
-        self.get(self.url)
-        res = self.get("http://hub.m.hust.edu.cn/kcb/todate/namecourse.action?kcname=&lsname=")
+        res = self.loginSession.get("http://hub.m.hust.edu.cn/kcb/todate/namecourse.action?kcname=&lsname=")
         soup = BeautifulSoup(res.text, features="html.parser")
         res = soup.find_all("li")
         for i in res:
