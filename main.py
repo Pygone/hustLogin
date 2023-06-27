@@ -2,6 +2,7 @@ import subprocess
 import sys
 
 from LoginSession import LoginSession
+from operate import operator
 
 userId = "xxx"
 password = "xxx"
@@ -11,5 +12,7 @@ if __name__ == "__main__":
     if x != 0:
         print("Tesseract 尚未安装完善")
         sys.exit(-1)
-    ex = LoginSession(userId=userId, password=password)
+    session = LoginSession(userId=userId, password=password)
+    session.get("url")
+    ex = operator(session)
     print(ex.transcript("xxx"))

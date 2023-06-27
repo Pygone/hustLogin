@@ -37,7 +37,8 @@ class Transcript:
 
     def run(self):
         if self.query is not None:
-            return self.mustSets[self.query] if self.query in self.mustSets.keys() else self.publicSets[self.query]
+            return self.mustSets[self.query] if self.query in self.mustSets.keys() else (
+                self.publicSets[self.query] if self.query in self.publicSets.keys() else "课程名称错误")
         else:
             self.mustSets.update(self.publicSets)
             return self.mustSets

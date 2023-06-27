@@ -1,7 +1,7 @@
 import re
 import time
 
-from LoginSession1 import LoginSession
+from LoginSession import LoginSession
 from Operation.Badminton import Badminton
 from Operation.Course import Course
 from Operation.CourseAttack import CourseAttack
