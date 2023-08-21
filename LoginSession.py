@@ -16,8 +16,8 @@ class LoginSession(requests.Session):
         super().__init__()
         self.code = None
         self.url = "https://one.hust.edu.cn/dcp/"
-        self.RSApassword = None
-        self.RSAuserId = None
+        self.rsa_password = None
+        self.rsa_userId = None
         self.rsa = None
         self.lt = None
         self.password = password
@@ -33,7 +33,7 @@ class LoginSession(requests.Session):
     def get_rsa(self):
         rsa = self.post("https://pass.hust.edu.cn/cas/rsa").json()
         self.rsa = rsa['publicKey']
-        self.RSAuserId, self.RSApassword = rsaEncoder(self.userId, self.password, self.rsa).encode()
+        self.rsa_userId, self.rsa_password = rsaEncoder(self.userId, self.password, self.rsa).encode()
 
     def get_lt(self):
         res = self.get(self.url)
@@ -49,8 +49,8 @@ class LoginSession(requests.Session):
             post_params = {
                 "code": self.code,
                 "rsa": "",
-                "ul": self.RSAuserId,
-                "pl": self.RSApassword,
+                "ul": self.rsa_userId,
+                "pl": self.rsa_password,
                 "lt": self.lt,
                 "execution": "e1s1",
                 "_eventId": "submit",

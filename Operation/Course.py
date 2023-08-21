@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from LoginSession import LoginSession
 
 
-class Course():
+class Course:
     def __init__(self, loginSession: LoginSession):
         super().__init__()
         self.loginSession = loginSession
