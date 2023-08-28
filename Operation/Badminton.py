@@ -12,14 +12,17 @@ user_agent = fake_useragent.UserAgent().chrome
 
 
 class Badminton:
-    def __init__(self, loginSession: LoginSession, partner: list, Date: str, start_time=None, cd: int = 1):
+    def __init__(self, loginSession: LoginSession, Date: str, start_time=None, cd: int = 1, partner: list = None):
         super().__init__()
         self.cd = cd
         s = datetime.datetime.strptime(start_time, "%H")
         self.start_time = s.strftime("%H:%M:%S")
         self.Date = Date
-        self.partner = partner
         self.loginSession = loginSession
+        if partner is not None:
+            self.partner = partner
+        else:
+            self.partner = None
 
     def run(self):
         Cd = json.load(open("src/court.json"))
@@ -31,6 +34,8 @@ class Badminton:
         self.loginSession.headers["Referer"] = url
         url = f"http://pecg.hust.edu.cn/cggl/front/syqk?date={yesterday.strftime('%Y-%m-%d')}&type=1&cdbh=45"
         res = self.loginSession.get(url)
+        if self.partner is None:
+            self.partner = re.findall("putPartner\('(.*)','(.*)','(.*)','(.*)'\);", res.text)[0]
         cg_csrf_token = re.search('name="cg_csrf_token" value="(.*)" />', res.text).group(1)
         token_1 = re.search(r'name=\\"token\\" value=\\"(.*)\\" >"', res.text).group(1)
         params = {"changdibh": "45",
@@ -54,9 +59,9 @@ class Badminton:
             ("starttime", self.start_time),
             ("endtime", end_time),
             ("partnerCardType", "1"),
-            ("partnerName", self.partner[0]),
-            ("partnerSchoolNo", self.partner[1]),
-            ("partnerPwd", self.partner[2]),
+            ("partnerName", self.partner[1]),
+            ("partnerSchoolNo", self.partner[2]),
+            ("partnerPwd", self.partner[0]),
             ("choosetime", Cd[str(self.cd)]),
             ("changdibh", "45"),
             ("date", date.strftime('%Y-%m-%d')),

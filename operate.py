@@ -25,8 +25,11 @@ class operator:
     def Schedule(self):
         return Course(self.loginSession).Courses
 
-    def badminton(self, partner: list, Date: str, start_time=None, cd: int = 1):
-        badminton = Badminton(self.loginSession, partner, Date, start_time, cd)
+    def badminton(self, Date: str, start_time=None, cd: int = 1, partner: list = None):
+        if partner is None:
+            badminton = Badminton(self.loginSession, Date, start_time, cd)
+        else :
+            badminton = Badminton(self.loginSession, Date, start_time, cd, partner)
         return badminton.run()
 
     def school_card(self, val, password):
