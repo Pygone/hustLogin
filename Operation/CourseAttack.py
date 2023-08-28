@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import random
 import re
 import sys
 import time
@@ -30,6 +31,8 @@ class CourseAttack():
         self.requestList = {}
         self.XQH = None
         self.KTBH = []
+
+    def init_(self):
         self.GetCourse()
         self.mutiGetClassId()
 
@@ -45,14 +48,15 @@ class CourseAttack():
 
     async def getclassId(self, url, data, course):
         async with aiohttp.ClientSession() as session:
-            async with session.post(url=url, data=data, headers=self.loginSession.headers) as response:
+            async with session.post(url=url, data=data, headers=self.loginSession.headers,
+                                    cookies=self.loginSession.cookies) as response:
                 assert response.status == 200
                 json = await response.json()
-                courseList = []
+                courseList = set()
                 for i in json["data"]:
                     if i["XM"] in self.course[course]:
-                        courseList.append(i["KTBH"])
-                self.requestList[course].append(courseList)
+                        courseList.add(i["KTBH"])
+                self.requestList[course].append(list(courseList))
 
     def GetCourse(self):
         data = {"page": 1, "limit": 10, "fzxkfs": "", "xkgz": 1}
@@ -106,7 +110,11 @@ class CourseAttack():
 
     def RobClass(self):
         while True:
+            if len(self.course) == 0:
+                sys.exit(1)
+            teachers_ = {}
             for course in self.course.keys():
+                teachers_[course] = []
                 data = {"page": 1, "limit": 10, "fzid": self.requestList[course][2],
                         "kcbh": self.requestList[course][1],
                         "sfid": self.userId, "faid": self.requestList[course][0], "id": self.requestList[course][0]}
@@ -114,6 +122,10 @@ class CourseAttack():
                 resjson = res.json()
                 for i in resjson["data"]:
                     if i["XM"] in self.course[course] and i["KTRS"] < i["KTRL"]:
+                        if i["XM"] not in teachers_[course]:
+                            teachers_[course].append(i['XM'])
+                        else:
+                            continue
                         response = self.loginSession.post(url="http://wsxk.hust.edu.cn/zyxxk/Stuxk/addStuxkIsxphx",
                                                           data={
                                                               "ktbh": i["KTBH"],
@@ -126,24 +138,32 @@ class CourseAttack():
                         json = response.json()
                         if json["code"] == "0":
                             logging.info(f"学号为{self.userId}的同学, 您已抢到{course}:{i['XM']}")
-                            sys.exit(-1)
+                            self.course.pop(course)
+                            continue
                         elif json['msg'] == '当前学期或之前学期已选该课程，不可重复选择，可在‘选课记录’中查看！':
                             logging.info(json['msg'])
-                            sys.exit(-1)
+                            self.course.pop(course)
+                            continue
                         else:
                             logging.info(json["msg"])
-                            time.sleep(10)
+                            sys.exit(1)
                     elif i["XM"] in self.course[course] and i["KTRS"] >= i["KTRL"]:
+                        if i["XM"] not in teachers_[course]:
+                            teachers_[course].append(i['XM'])
+                        else:
+                            continue
                         logging.info("课堂人数仍为满, 继续等待!")
-                        time.sleep(10)
+                        logging.info(datetime.now())
+            time.sleep(5)
 
     def run(self, T: str):
+        self.init_()
         if self.function == "Attack":
             while True:
                 date = datetime.strptime(str(datetime.today().year) + "/" + T, '%Y/%m/%d/%H/%M')
                 diff = (datetime.now() - date)
                 diff = diff.days * 86400 + diff.seconds
-                if diff > 0:
+                if diff > 1:
                     self.mutiPost()
                     break
                 else:

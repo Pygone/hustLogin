@@ -1,5 +1,6 @@
 import datetime
 import json
+import logging
 import re
 import time
 
@@ -10,11 +11,12 @@ from LoginSession import LoginSession
 user_agent = fake_useragent.UserAgent().chrome
 
 
-class Badminton():
+class Badminton:
     def __init__(self, loginSession: LoginSession, partner: list, Date: str, start_time=None, cd: int = 1):
         super().__init__()
         self.cd = cd
-        self.start_time = start_time
+        s = datetime.datetime.strptime(start_time, "%H")
+        self.start_time = s.strftime("%H:%M:%S")
         self.Date = Date
         self.partner = partner
         self.loginSession = loginSession
@@ -32,7 +34,12 @@ class Badminton():
         cg_csrf_token = re.search('name="cg_csrf_token" value="(.*)" />', res.text).group(1)
         token_1 = re.search(r'name=\\"token\\" value=\\"(.*)\\" >"', res.text).group(1)
         params = {"changdibh": "45",
-                  "data": "110@08:00:00-10:00:00,133@08:00:00-10:00:00,215@08:00:00-10:00:00,216@08:00:00-10:00:00,218@08:00:00-10:00:00,376@08:00:00-10:00:00,217@08:00:00-10:00:00,219@08:00:00-10:00:00,220@08:00:00-10:00:00,221@08:00:00-10:00:00,222@08:00:00-10:00:00,223@08:00:00-10:00:00,224@08:00:00-10:00:00,368@08:00:00-10:00:00,369@08:00:00-10:00:00,370@08:00:00-10:00:00,377@08:00:00-10:00:00,371@08:00:00-10:00:00,372@08:00:00-10:00:00,373@08:00:00-10:00:00,374@08:00:00-10:00:00,375@08:00:00-10:00:00,",
+                  "data": "110@08:00:00-10:00:00,133@08:00:00-10:00:00,215@08:00:00-10:00:00,216@08:00:00-10:00:00,"
+                          "218@08:00:00-10:00:00,376@08:00:00-10:00:00,217@08:00:00-10:00:00,219@08:00:00-10:00:00,"
+                          "220@08:00:00-10:00:00,221@08:00:00-10:00:00,222@08:00:00-10:00:00,223@08:00:00-10:00:00,"
+                          "224@08:00:00-10:00:00,368@08:00:00-10:00:00,369@08:00:00-10:00:00,370@08:00:00-10:00:00,"
+                          "377@08:00:00-10:00:00,371@08:00:00-10:00:00,372@08:00:00-10:00:00,373@08:00:00-10:00:00,"
+                          "374@08:00:00-10:00:00,375@08:00:00-10:00:00,",
                   "date": date.strftime('%Y-%m-%d'),
                   "time": time.strftime('%a %b %d %Y %H:%M:%S GMT+0800 (中国标准时间)', time.localtime()),
                   "token": token_1
@@ -58,6 +65,19 @@ class Badminton():
         ]
         self.loginSession.headers[
             "Referer"] = f"http://pecg.hust.edu.cn/cggl/front/syqk?date={yesterday.strftime('%Y-%m-%d')}&type=1&cdbh=45"
+        while True:
+            date = datetime.datetime.strptime(self.Date + " 08", '%Y-%m-%d %H') - datetime.timedelta(days=2)
+            diff = (datetime.datetime.now() - date)
+            diff = diff.days * 86400 + diff.seconds
+            if diff > 1:
+                break
+            else:
+                logging.info(f"等待中, 剩余{-diff}secs 开始")
+                if -diff > 10:
+                    time.sleep(-diff - 10)
+                else:
+                    time.sleep(1)
+                continue
         res = self.loginSession.post("http://pecg.hust.edu.cn/cggl/front/step2", data=params)
         data = re.search('name="data" value="(.*)" type', res.text).group(1)
         Id = re.search('name="id" value="(.*)" type', res.text).group(1)
@@ -65,7 +85,8 @@ class Badminton():
             ("data", data),
             ("id", Id),
             ("cg_csrf_token", cg_csrf_token),
-            ("token", token_2)
+            ("token", token_2),
+            ("select_pay_type", -1)
         ]
         self.loginSession.headers["Referer"] = "http://pecg.hust.edu.cn/cggl/front/step2"
         res = self.loginSession.post("http://pecg.hust.edu.cn/cggl/front/step3", data=params)

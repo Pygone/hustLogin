@@ -13,7 +13,7 @@ class operator:
         self.userId = None
         self.loginSession = loginSession
 
-    def course(self, course: dict, time: str, function: str = "Attack"):
+    def course(self, course: dict, time: str = "", function: str = "Attack"):
         course = CourseAttack(self.loginSession, self.userId, course, function)
         course.run(time)
 
@@ -29,7 +29,7 @@ class operator:
         badminton = Badminton(self.loginSession, partner, Date, start_time, cd)
         return badminton.run()
 
-    def xyk(self, val, password):
+    def school_card(self, val, password):
         res = self.loginSession.get("http://ecard.m.hust.edu.cn/wechat-web/ChZhController/ChongZhiurl.html")
         cardno = re.search('id="cardno" value="(.*)"/>', res.text).group(1)
         res = self.loginSession.post("http://ecard.m.hust.edu.cn/wechat-web/ChZhController/ChongZhi.html", data={
