@@ -4,6 +4,7 @@ from pytesseract import image_to_string
 
 # 借用libhustpass
 
+
 def depoint(img):
     pic_data = img.load()
     w, h = img.size
@@ -35,9 +36,7 @@ def deCaptcha(imageContent):
     res = [{}, {}, {}, {}]
 
     def analyseCode(c, i):
-        code_map = {
-            0: [1, 2, 3], 1: [0, 1, 2, 3], 2: [0, 1, 2], 3: [0, 1, 3]
-        }
+        code_map = {0: [1, 2, 3], 1: [0, 1, 2, 3], 2: [0, 1, 2], 3: [0, 1, 3]}
         while len(c) < 3 or (i == 1 and len(c) <= 3):
             c += "-"
         if i == 0 and len(c) > 3:
@@ -45,7 +44,7 @@ def deCaptcha(imageContent):
         if i == 3 and len(c) > 3:
             c = c[:2] + c[3]
         for j in range(len(code_map[i])):
-            if c[j] == '-':
+            if c[j] == "-":
                 break
             if c[j] not in res[code_map[i][j]].keys():
                 res[code_map[i][j]][c[j]] = 1
@@ -57,12 +56,22 @@ def deCaptcha(imageContent):
         try:
             imageObject.seek(0)
             while True:
-                grayImage = ImageOps.expand(imageObject.convert("L"), border=5, fill='white')
+                grayImage = ImageOps.expand(
+                    imageObject.convert("L"), border=5, fill="white"
+                )
                 binarizedImage = grayImage.point(lambda i: i == 255 and 255)
                 depointedImage = depoint(binarizedImage)
-                code = image_to_string(depointedImage,
-                                       config='--psm 11 --oem 3 -c tessedit_char_whitelist=aGQOo0123456789')
-                code = code.replace("o", '0').replace("Q", '0').replace("O", '0').replace("G", '6').replace("a", '0')
+                code = image_to_string(
+                    depointedImage,
+                    config="--psm 11 --oem 3 -c tessedit_char_whitelist=aGQOo0123456789",
+                )
+                code = (
+                    code.replace("o", "0")
+                    .replace("Q", "0")
+                    .replace("O", "0")
+                    .replace("G", "6")
+                    .replace("a", "0")
+                )
                 analyseCode(code.strip(), i)
                 i += 1
                 imageObject.seek(i)
