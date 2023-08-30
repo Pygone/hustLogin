@@ -84,3 +84,25 @@ class operator:
             },
         )
         return re.search('"errmsg":"(.*?)"', res.text).group(1)
+
+    def professional_course(self):
+        time.sleep(2)
+        self.loginSession.get("http://hubs.hust.edu.cn/hustpass.action")
+        res = self.loginSession.post(
+            "http://hubs.hust.edu.cn/plan/Plan_queryPlanModuleCourse.action",
+            data={"nj": "2021", "zybh": "004068", "mkid": "2708"},
+        )
+        course_credit = {}
+        for i in res.json()["data"]:
+            course_credit[i["KCMC"]] = []
+            course_credit[i["KCMC"]].append(i["KCZXF"])
+            temp = self.loginSession.post(
+                "http://hubs.hust.edu.cn/plan/Plan_queryXdbj.action",
+                data={"kcbh": i["KCBH"]},
+            )
+            course_credit[i["KCMC"]].append(temp.json()["result"])
+        sum_credit = 0
+        for i in course_credit.values():
+            if i[1]:
+                sum_credit += i[0]
+        print(sum_credit)
