@@ -110,68 +110,69 @@ class operator:
         print(sum_credit)
 
     def public_course(self, query: list):
-        def analyseHtml(html):
-            soup = BeautifulSoup(html, features="html.parser")
-            res_list = soup.table.find_all("tr")[3].find_all("td")
+        valid_list = list()
+
+        def get_all_courseParams(course_id):
+            res_ = self.loginSession.post(
+                "http://wsxk.hust.edu.cn/zxqstudentcourse/zxqclassroom.action",
+                data={"markZB": "", "ggkdll": "", "kcbh": course_id},
+            )
+            soup = BeautifulSoup(res_.text, features="html.parser")
+            course_ids = re.findall("ClassWhenWhereForZxq\('(.*)','.*'\)", res_.text)
+            rooms = re.findall("selectKT\(this.id,'(.*)','(.*)'\);", res_.text)
             res_list2 = soup.table.find_all("tr")[1].form.find_all("input")
             res_dict = {}
             for i in res_list2:
                 res_dict[i["name"]] = i["value"]
-            res_dict["ktbh"] = res_list[0].string.strip()
-            res_dict["ktrl"] = res_list[4].string.strip().split("/")[1]
-            res_dict["ktrs"] = res_list[4].string.strip().split("/")[0]
-            return res_dict
+            for i in range(len(rooms)):
+                res_dict["ktbh"] = course_ids[i]
+                res_dict["ktrl"] = rooms[i][0]
+                res_dict["ktrs"] = rooms[i][1]
+                valid_list.append(res_dict.copy())
 
-        def test_if_conflict(course):
-            res = self.loginSession.post(
-                "http://wsxk.hust.edu.cn/zxqstudentcourse/zxqclassroom.action",
-                data={"markZB": "", "ggkdll": "", "kcbh": resT[0]},
-            )
-            course_dict = analyseHtml(res.text)
-            res = self.loginSession.post(
-                "http://wsxk.hust.edu.cn/zxqstudentcourse/zxqcoursesresult.action",
-                data=course_dict,
-            )
-            soup = BeautifulSoup(res.text, features="html.parser")
-            msg = soup.body.div.find_all("div")[1].ul.li.string.strip()
-            if "冲突" in msg:
-                print("选课时间冲突")
-                query.remove(course)
+        def test_if_conflict():
+            for course_dict_ in valid_list:
+                res_ = self.loginSession.post(
+                    "http://wsxk.hust.edu.cn/zxqstudentcourse/zxqcoursesresult.action",
+                    data=course_dict_,
+                )
+                soup = BeautifulSoup(res_.text, features="html.parser")
+                try:
+                    msg = soup.body.div.find_all("div")[1].ul.li.string.strip()
+                    if "冲突" in msg:
+                        print("选课时间冲突")
+                        valid_list.remove(course_dict_)
+                    else:
+                        print("选课成功", course_dict_["kcmc"])
+                        valid_list.remove(course_dict_)
+                except:
+                    print("存在冲突")
+                    valid_list.remove(course_dict_)
 
         self.loginSession.get("http://wsxk.hust.edu.cn/hustpass2.action")
         time.sleep(0.5)
         self.loginSession.get(
             "http://wsxk.hust.edu.cn/studentControl!chooseSystem.action?xkxt=zxq"
         )
-        time.sleep(0.5)
         for course in query:
             res = self.loginSession.post(
                 "http://wsxk.hust.edu.cn/zxqstudentcourse/zxqcourses.action",
                 data={"markZB": "", "ggkdll": "", "GGKDLBH": "0", "kcmc": course},
             )
-            resT = re.findall("onclick=\"selectKT\(this.id,'(.*)'\)", res.text)
-            test_if_conflict(course)
+            course_id = re.search("onclick=\"selectKT\(this.id,'(.*)'\)", res.text).group(1)
+            get_all_courseParams(course_id)
+        test_if_conflict()
         while True:
-            if len(query) == 0:
+            if len(valid_list) == 0:
                 break
-            for course in query:
-                res = self.loginSession.post(
-                    "http://wsxk.hust.edu.cn/zxqstudentcourse/zxqcourses.action",
-                    data={"markZB": "", "ggkdll": "", "GGKDLBH": "0", "kcmc": course},
-                )
-                resT = re.findall("onclick=\"selectKT\(this.id,'(.*)'\)", res.text)
-                res = self.loginSession.post(
-                    "http://wsxk.hust.edu.cn/zxqstudentcourse/zxqclassroom.action",
-                    data={"markZB": "", "ggkdll": "", "kcbh": resT[0]},
-                )
-                course_dict = analyseHtml(res.text)
+            for course_dict in valid_list:
                 if course_dict["ktrs"] < course_dict["ktrl"]:
                     self.loginSession.post(
                         "http://wsxk.hust.edu.cn/zxqstudentcourse/zxqcoursesresult.action",
                         data=course_dict,
                     )
-                    query.remove(course)
+                    valid_list.remove(course_dict)
                     continue
                 else:
-                    print(f"{course}课堂仍为满人")
+                    print(course_dict["kcmc"], "full")
             time.sleep(random.randint(5, 10))
