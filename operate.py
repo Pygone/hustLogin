@@ -131,7 +131,8 @@ class operator:
                 valid_list.append(res_dict.copy())
 
         def test_if_conflict():
-            for course_dict_ in valid_list:
+            validList = valid_list.copy()
+            for course_dict_ in validList:
                 res_ = self.loginSession.post(
                     "http://wsxk.hust.edu.cn/zxqstudentcourse/zxqcoursesresult.action",
                     data=course_dict_,
@@ -140,10 +141,13 @@ class operator:
                 try:
                     msg = soup.body.div.find_all("div")[1].ul.li.string.strip()
                     if "冲突" in msg:
-                        print("选课时间冲突")
+                        print(course_dict_["kcmc"], "选课时间冲突")
+                        valid_list.remove(course_dict_)
+                    elif "已经选修该公共任选课，不能够再选修该公共任选课" in msg:
+                        print("您已选修该课程", course_dict_["kcmc"])
                         valid_list.remove(course_dict_)
                     else:
-                        print("选课成功", course_dict_["kcmc"])
+                        print(msg)
                         valid_list.remove(course_dict_)
                 except:
                     print("存在冲突")
@@ -163,9 +167,10 @@ class operator:
             get_all_courseParams(course_id)
         test_if_conflict()
         while True:
+            ValList = valid_list.copy()
             if len(valid_list) == 0:
                 break
-            for course_dict in valid_list:
+            for course_dict in ValList:
                 if course_dict["ktrs"] < course_dict["ktrl"]:
                     self.loginSession.post(
                         "http://wsxk.hust.edu.cn/zxqstudentcourse/zxqcoursesresult.action",
@@ -174,5 +179,5 @@ class operator:
                     valid_list.remove(course_dict)
                     continue
                 else:
-                    print(course_dict["kcmc"], "full")
-            time.sleep(random.randint(5, 10))
+                    print(course_dict["kcmc"], "full, keep waiting")
+            time.sleep(random.randint(5, 8))

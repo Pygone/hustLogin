@@ -2,9 +2,6 @@ from PIL import Image
 from pytesseract import image_to_string
 
 
-# 借用libhustpass
-
-
 def deCaptcha(imageContent):
     img_list = []
     with Image.open(imageContent) as img_gif:
