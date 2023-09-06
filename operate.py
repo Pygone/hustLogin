@@ -1,5 +1,6 @@
 import random
 import re
+import sys
 import time
 
 from bs4 import BeautifulSoup
@@ -110,6 +111,34 @@ class operator:
         print(sum_credit)
 
     def public_course(self, query: str):
+        def analyseHtml(html):
+            soup = BeautifulSoup(html, features="html.parser")
+            res_list = soup.table.find_all("tr")[3].find_all("td")
+            res_list2 = soup.table.find_all("tr")[1].form.find_all("input")
+            res_dict = {}
+            for i in res_list2:
+                res_dict[i["name"]] = i["value"]
+            res_dict["ktbh"] = res_list[0].string.strip()
+            res_dict["ktrl"] = res_list[4].string.strip().split("/")[1]
+            res_dict["ktrs"] = res_list[4].string.strip().split("/")[0]
+            return res_dict
+
+        def test_if_conflict():
+            res = self.loginSession.post(
+                "http://wsxk.hust.edu.cn/zxqstudentcourse/zxqclassroom.action",
+                data={"markZB": "", "ggkdll": "", "kcbh": resT[0]},
+            )
+            course_dict = analyseHtml(res.text)
+            res = self.loginSession.post(
+                "http://wsxk.hust.edu.cn/zxqstudentcourse/zxqcoursesresult.action",
+                data=course_dict,
+            )
+            soup = BeautifulSoup(res.text, features="html.parser")
+            msg = soup.body.div.find_all("div")[1].ul.li.string.strip()
+            if "冲突" in msg:
+                print("选课时间冲突")
+                sys.exit(1)
+
         self.loginSession.get("http://wsxk.hust.edu.cn/hustpass2.action")
         time.sleep(0.5)
         self.loginSession.get(
@@ -121,31 +150,20 @@ class operator:
             data={"markZB": "", "ggkdll": "", "GGKDLBH": "0", "kcmc": query},
         )
         resT = re.findall("onclick=\"selectKT\(this.id,'(.*)'\)", res.text)
+        test_if_conflict()
         while True:
             res = self.loginSession.post(
                 "http://wsxk.hust.edu.cn/zxqstudentcourse/zxqclassroom.action",
                 data={"markZB": "", "ggkdll": "", "kcbh": resT[0]},
             )
-            course_dict = self.analyseHtml(res.text)
+            course_dict = analyseHtml(res.text)
             if course_dict["ktrs"] < course_dict["ktrl"]:
                 break
             else:
+                print("课堂仍为满人")
                 time.sleep(random.randint(5, 10))
         self.loginSession.post(
             "http://wsxk.hust.edu.cn/zxqstudentcourse/zxqcoursesresult.action",
             data=course_dict,
         )
         print(f"{query}选课成功")
-
-    @staticmethod
-    def analyseHtml(html):
-        soup = BeautifulSoup(html, features="html.parser")
-        res_list = soup.table.find_all("tr")[3].find_all("td")
-        res_list2 = soup.table.find_all("tr")[1].form.find_all("input")
-        res_dict = {}
-        for i in res_list2:
-            res_dict[i["name"]] = i["value"]
-        res_dict["ktbh"] = res_list[0].string.strip()
-        res_dict["ktrl"] = res_list[4].string.strip().split("/")[1]
-        res_dict["ktrs"] = res_list[4].string.strip().split("/")[0]
-        return res_dict

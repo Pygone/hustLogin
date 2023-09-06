@@ -1,83 +1,20 @@
-from PIL import Image, ImageOps
+from PIL import Image
 from pytesseract import image_to_string
 
 
 # 借用libhustpass
 
 
-def depoint(img):
-    pic_data = img.load()
-    w, h = img.size
-    for y in range(1, h - 1):
-        for x in range(1, w - 1):
-            count = 0
-            if pic_data[x, y - 1] > 245:  # 上
-                count = count + 1
-            if pic_data[x, y + 1] > 245:  # 下
-                count = count + 1
-            if pic_data[x - 1, y] > 245:  # 左
-                count = count + 1
-            if pic_data[x + 1, y] > 245:  # 右
-                count = count + 1
-            if pic_data[x - 1, y - 1] > 245:  # 左上
-                count = count + 1
-            if pic_data[x - 1, y + 1] > 245:  # 左下
-                count = count + 1
-            if pic_data[x + 1, y - 1] > 245:  # 右上
-                count = count + 1
-            if pic_data[x + 1, y + 1] > 245:  # 右下
-                count = count + 1
-            if count > 5:
-                pic_data[x, y] = 255
-    return img
-
-
 def deCaptcha(imageContent):
-    res = [{}, {}, {}, {}]
-
-    def analyseCode(c, i):
-        code_map = {0: [1, 2, 3], 1: [0, 1, 2, 3], 2: [0, 1, 2], 3: [0, 1, 3]}
-        while len(c) < 3 or (i == 1 and len(c) <= 3):
-            c += "-"
-        if i == 0 and len(c) > 3:
-            c = c[1:]
-        if i == 3 and len(c) > 3:
-            c = c[:2] + c[3]
-        for j in range(len(code_map[i])):
-            if c[j] == "-":
-                break
-            if c[j] not in res[code_map[i][j]].keys():
-                res[code_map[i][j]][c[j]] = 1
-            else:
-                res[code_map[i][j]][c[j]] += 1
-
-    with Image.open(imageContent) as imageObject:
-        i = 0
-        try:
-            imageObject.seek(0)
-            while True:
-                grayImage = ImageOps.expand(
-                    imageObject.convert("L"), border=5, fill="white"
-                )
-                binarizedImage = grayImage.point(lambda i: i == 255 and 255)
-                depointedImage = depoint(binarizedImage)
-                code = image_to_string(
-                    depointedImage,
-                    config="--psm 11 --oem 3 -c tessedit_char_whitelist=aGQOo0123456789",
-                )
-                code = (
-                    code.replace("o", "0")
-                    .replace("Q", "0")
-                    .replace("O", "0")
-                    .replace("G", "6")
-                    .replace("a", "0")
-                )
-                analyseCode(code.strip(), i)
-                i += 1
-                imageObject.seek(i)
-        except:
-            pass
-    code = ""
-    for i in res:
-        code += str(max(i, key=i.get))
-    return code
+    img_list = []
+    with Image.open(imageContent) as img_gif:
+        for i in range(img_gif.n_frames):
+            img_gif.seek(i)
+            img_list.append(img_gif.copy().convert('L'))
+    width, height = img_list[0].size
+    img_merge = Image.new(mode='L', size=(width + 10, height + 10), color=255)
+    for pos in [(x, y) for x in range(width) for y in range(height)]:
+        if sum([img.getpixel(pos) < 254 for img in img_list]) >= 3:
+            img_merge.putpixel((pos[0] + 5, pos[1] + 5), 0)
+    code = image_to_string(img_merge, config='-c tessedit_char_whitelist=0123456789 --psm 11')
+    return code.strip()
