@@ -146,6 +146,8 @@ class operator:
                     elif "已经选修该公共任选课，不能够再选修该公共任选课" in msg:
                         print("您已选修该课程", course_dict_["kcmc"])
                         valid_list.remove(course_dict_)
+                    elif "选课失败，课堂人数已满！" in msg:
+                        continue
                     else:
                         print(msg)
                         valid_list.remove(course_dict_)
