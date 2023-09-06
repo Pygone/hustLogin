@@ -1,5 +1,8 @@
+import random
 import re
 import time
+
+from bs4 import BeautifulSoup
 
 from LoginSession import LoginSession
 from Operation.Badminton import Badminton
@@ -86,7 +89,6 @@ class operator:
         return re.search('"errmsg":"(.*?)"', res.text).group(1)
 
     def professional_course(self):
-        time.sleep(2)
         self.loginSession.get("http://hubs.hust.edu.cn/hustpass.action")
         res = self.loginSession.post(
             "http://hubs.hust.edu.cn/plan/Plan_queryPlanModuleCourse.action",
@@ -106,3 +108,44 @@ class operator:
             if i[1]:
                 sum_credit += i[0]
         print(sum_credit)
+
+    def public_course(self, query: str):
+        self.loginSession.get("http://wsxk.hust.edu.cn/hustpass2.action")
+        time.sleep(0.5)
+        self.loginSession.get(
+            "http://wsxk.hust.edu.cn/studentControl!chooseSystem.action?xkxt=zxq"
+        )
+        time.sleep(0.5)
+        res = self.loginSession.post(
+            "http://wsxk.hust.edu.cn/zxqstudentcourse/zxqcourses.action",
+            data={"markZB": "", "ggkdll": "", "GGKDLBH": "0", "kcmc": query},
+        )
+        resT = re.findall("onclick=\"selectKT\(this.id,'(.*)'\)", res.text)
+        while True:
+            res = self.loginSession.post(
+                "http://wsxk.hust.edu.cn/zxqstudentcourse/zxqclassroom.action",
+                data={"markZB": "", "ggkdll": "", "kcbh": resT[0]},
+            )
+            course_dict = self.analyseHtml(res.text)
+            if course_dict["ktrs"] < course_dict["ktrl"]:
+                break
+            else:
+                time.sleep(random.randint(5, 10))
+        self.loginSession.post(
+            "http://wsxk.hust.edu.cn/zxqstudentcourse/zxqcoursesresult.action",
+            data=course_dict,
+        )
+        print(f"{query}选课成功")
+
+    @staticmethod
+    def analyseHtml(html):
+        soup = BeautifulSoup(html, features="html.parser")
+        res_list = soup.table.find_all("tr")[3].find_all("td")
+        res_list2 = soup.table.find_all("tr")[1].form.find_all("input")
+        res_dict = {}
+        for i in res_list2:
+            res_dict[i["name"]] = i["value"]
+        res_dict["ktbh"] = res_list[0].string.strip()
+        res_dict["ktrl"] = res_list[4].string.strip().split("/")[1]
+        res_dict["ktrs"] = res_list[4].string.strip().split("/")[0]
+        return res_dict
