@@ -110,6 +110,7 @@ class operator:
         print(sum_credit)
 
     def public_course(self, query: list):
+        time.sleep(0.5)
         valid_list = list()
 
         def get_all_courseParams(course_id):
@@ -173,13 +174,17 @@ class operator:
             if len(valid_list) == 0:
                 break
             for course_dict in ValList:
-                if course_dict["ktrs"] < course_dict["ktrl"]:
-                    self.loginSession.post(
-                        "http://wsxk.hust.edu.cn/zxqstudentcourse/zxqcoursesresult.action",
-                        data=course_dict,
-                    )
-                    valid_list.remove(course_dict)
+
+                res_ = self.loginSession.post(
+                    "http://wsxk.hust.edu.cn/zxqstudentcourse/zxqcoursesresult.action",
+                    data=course_dict,
+                )
+
+                soup = BeautifulSoup(res_.text, features="html.parser")
+                msg = soup.body.div.find_all("div")[1].ul.li.string.strip()
+                if "选课失败，课堂人数已满！" in msg:
+                    print(course_dict["kcmc"],msg)
                     continue
                 else:
-                    print(course_dict["kcmc"], "full, keep waiting")
+                    valid_list.remove(course_dict)
             time.sleep(random.randint(5, 8))
