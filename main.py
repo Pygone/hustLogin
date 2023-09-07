@@ -10,6 +10,6 @@ if __name__ == "__main__":
         pytesseract.get_tesseract_version()
         session = LoginSession(userId=userId, password=password)
         ex = operator(session, userId)
-        print(ex.transcript())
+        print(ex.public_course(["节奏世界"]))
     except pytesseract.TesseractNotFoundError:
         print("your device haven't installed tesseract yet")

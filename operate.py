@@ -1,4 +1,3 @@
-import random
 import re
 import time
 
@@ -183,8 +182,10 @@ class operator:
                 soup = BeautifulSoup(res_.text, features="html.parser")
                 msg = soup.body.div.find_all("div")[1].ul.li.string.strip()
                 if "选课失败，课堂人数已满！" in msg:
-                    print(course_dict["kcmc"],msg)
+                    print(course_dict["kcmc"], msg)
                     continue
                 else:
-                    valid_list.remove(course_dict)
-            time.sleep(random.randint(5, 8))
+                    print(course_dict["kcmc"], "选课成功")
+                    for i in ValList:
+                        if i["kcmc"] == course_dict["kcmc"]:
+                            valid_list.remove(i)
