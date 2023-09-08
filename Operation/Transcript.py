@@ -21,7 +21,7 @@ class Transcript:
     def get_data(self):
         res = self.loginSession.get(
             "https://cjd.hust.edu.cn/cas/client/validateLogin"
-            + self.url[self.url.find("?") :]
+            + self.url[self.url.find("?"):]
             + "&service=https://cjd.hust.edu.cn/bks/"
         )
         self.loginSession.cookies.set("X-Access-Token", res.json()["result"]["token"])
@@ -41,7 +41,7 @@ class Transcript:
             else:
                 self.publicSets[i["courseCname"]] = (i["scoreText"], float(i["credit"]))
 
-    def run(self):
+    def run(self) -> dict:
         if self.query is not None:
             return (
                 self.mustSets[self.query]
