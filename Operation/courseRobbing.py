@@ -21,7 +21,7 @@ logging.basicConfig(
 )
 
 
-class CourseAttack:
+class courseRobbing:
     def __init__(
         self, loginSession: LoginSession, userId, course: dict, function: str = "Attack"
     ):

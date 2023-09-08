@@ -40,3 +40,6 @@ class Course:
             temp = re.search(pattern, t).group(1)
             t = t.replace(temp, temp.replace("\n", ""))
             self.add(t)
+
+    def schedule(self):
+        return self.Courses

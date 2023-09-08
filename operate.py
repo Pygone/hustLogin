@@ -2,12 +2,12 @@ import re
 import time
 
 from LoginSession import LoginSession
-from Operation.Badminton import Badminton
-from Operation.Course import Course
-from Operation.CourseAttack import CourseAttack
-from Operation.Transcript import Transcript
+from Operation.badminton import Badminton
+from Operation.course import Course
+from Operation.courseRobbing import courseRobbing
 from Operation.professionalCourse import professionalCourse
 from Operation.publicCourse import publicCourse
+from Operation.transcript import Transcript
 
 
 class operator:
@@ -30,7 +30,7 @@ class operator:
                Rob 后台自动等待退选抢课 ( 由于选课机制更改 已失效)
         :return:
         """
-        course = CourseAttack(self.loginSession, self.userId, course, function)
+        course = courseRobbing(self.loginSession, self.userId, course, function)
         course.run(time_)
 
     def transcript(self, query: str = None) -> dict:
@@ -40,15 +40,14 @@ class operator:
         :return:
         """
         transcript = Transcript(self.loginSession, query)
-        res = transcript.run()
-        return res
+        return transcript.run()
 
-    def Schedule(self):
+    def schedule(self):
         """
         课程表数据查询
         :return: 返回个人的课程表数据 json格式
         """
-        return Course(self.loginSession).Courses
+        return Course(self.loginSession).schedule()
 
     def badminton(self, Date: str, start_time, cd: int = 1, partner: list = None) -> str:
         """
@@ -87,7 +86,7 @@ class operator:
         )
         return re.search('"errmsg":"(.*?)"', res.text).group(1)
 
-    def professional_course(self):
+    def professional_credit(self):
         return professionalCourse(self.loginSession)
 
     def public_course(self, query: list):
