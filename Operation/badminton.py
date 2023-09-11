@@ -96,31 +96,34 @@ class Badminton:
             ) - datetime.timedelta(days=2)
             diff = datetime.datetime.now() - date
             diff = diff.days * 86400 + diff.seconds
-            if diff > 1:
+            if diff > 0.1:
                 break
             else:
                 logging.info(f"等待中, 剩余{-diff}secs 开始")
-                if -diff > 10:
-                    time.sleep(-diff - 10)
+                if -diff > 3:
+                    time.sleep(-diff - 3)
                 else:
-                    time.sleep(1)
+                    time.sleep(0.1)
                 continue
         res = self.loginSession.post(
             "http://pecg.hust.edu.cn/cggl/front/step2", data=params
         )
-        data = re.search('name="data" value="(.*)" type', res.text).group(1)
-        Id = re.search('name="id" value="(.*)" type', res.text).group(1)
-        params = [
-            ("data", data),
-            ("id", Id),
-            ("cg_csrf_token", cg_csrf_token),
-            ("token", token_2),
-            ("select_pay_type", -1),
-        ]
-        self.loginSession.headers[
-            "Referer"
-        ] = "http://pecg.hust.edu.cn/cggl/front/step2"
-        res = self.loginSession.post(
-            "http://pecg.hust.edu.cn/cggl/front/step3", data=params
-        )
+        try:
+            data = re.search('name="data" value="(.*)" type', res.text).group(1)
+            Id = re.search('name="id" value="(.*)" type', res.text).group(1)
+            params = [
+                ("data", data),
+                ("id", Id),
+                ("cg_csrf_token", cg_csrf_token),
+                ("token", token_2),
+                ("select_pay_type", -1),
+            ]
+            self.loginSession.headers[
+                "Referer"
+            ] = "http://pecg.hust.edu.cn/cggl/front/step2"
+            res = self.loginSession.post(
+                "http://pecg.hust.edu.cn/cggl/front/step3", data=params
+            )
+        except AttributeError:
+            return re.search(r"alert\(HTMLDecode\('(.*)'\), '提示信息'\);", res.text).group(1)
         return re.search(r"alert\(HTMLDecode\('(.*)'\), '提示信息'\);", res.text).group(1)
