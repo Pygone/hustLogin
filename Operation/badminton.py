@@ -16,7 +16,7 @@ class Badminton:
             self,
             loginSession: LoginSession,
             Date: str,
-            start_time=None,
+            start_time: str,
             cd: int = 1,
             partner: list = None,
     ):
