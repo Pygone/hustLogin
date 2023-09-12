@@ -5,6 +5,7 @@ import re
 import time
 
 import fake_useragent
+from bs4 import BeautifulSoup
 
 from LoginSession import LoginSession
 
@@ -32,7 +33,20 @@ class Badminton:
         else:
             self.partner = None
 
+    def ecard(self):
+        url = "http://ecard.m.hust.edu.cn/wechat-web/service/new_profile.html"
+        res = self.loginSession.get(url)
+        soup = BeautifulSoup(res.text, features="html.parser")
+        bills = float(soup.section.find_all("dl")[9].dd.div.span.string.strip("元"))
+        if bills < 40 and self.start_time >= "18:00:00":
+            return True
+        if bills < 20 and self.start_time < "18:00:00":
+            return True
+        return False
+
     def run(self) -> str:
+        if self.ecard():
+            return "电子账户余额不足"
         Cd = json.load(open("src/court.json"))
         date = datetime.datetime.strptime(self.Date, "%Y-%m-%d")
         yesterday = date - datetime.timedelta(days=1)
@@ -96,7 +110,6 @@ class Badminton:
                 params["partner_passwd"] = partner[0]
                 text = self.loginSession.post("http://pecg.hust.edu.cn/cggl/front/addPartner", data=params)
                 info = re.search(r"alert\(HTMLDecode\('(.*)'\), '提示信息'\);", text.text).group(1)
-
                 if "你已添加该同伴，请勿重复添加" in info:
                     self.partner = partner
                     break
