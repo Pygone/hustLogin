@@ -26,6 +26,7 @@ class Badminton:
         self.start_time = s.strftime("%H:%M:%S")
         self.Date = Date
         self.loginSession = loginSession
+        self.partners = None
         if partner is not None:
             self.partner = partner
         else:
@@ -44,12 +45,10 @@ class Badminton:
         url = f"http://pecg.hust.edu.cn/cggl/front/syqk?date={yesterday.strftime('%Y-%m-%d')}&type=1&cdbh=45"
         res = self.loginSession.get(url)
         if self.partner is None:
-            partners = re.findall(
+            self.partners = re.findall(
                 "putPartner\('(.*)','(.*)','(.*)','(.*)'\);", res.text
             )
-            if len(partners) != 0:
-                self.partner = partners[0]
-            else:
+            if len(self.partners) == 0:
                 return "您的账户未绑定同伴"
         cg_csrf_token = re.search(
             'name="cg_csrf_token" value="(.*)" />', res.text
@@ -78,6 +77,31 @@ class Badminton:
         ).json()
         self.loginSession.headers.pop("X-Requested-With")
         token_2 = res[0]["token"]
+        if self.partner is None:
+            params = {
+                "id": "0",
+                "member_id": "56558",
+                "partner_name": "",
+                "partner_type": "1",
+                "partner_schoolno": "",
+                "partner_passwd": "",
+                "cg_csrf_token": cg_csrf_token,
+                "token": token_2
+            }
+            for partner in self.partners:
+                if partner[2] == self.loginSession.userId:
+                    return "不可将自己设置为同伴"
+                params["partner_name"] = partner[1]
+                params["partner_schoolno"] = partner[2]
+                params["partner_passwd"] = partner[0]
+                text = self.loginSession.post("http://pecg.hust.edu.cn/cggl/front/addPartner", data=params)
+                info = re.search(r"alert\(HTMLDecode\('(.*)'\), '提示信息'\);", text.text).group(1)
+
+                if "你已添加该同伴，请勿重复添加" in info:
+                    self.partner = partner
+                    break
+            if self.partner is None:
+                return "您的账户绑定的同伴均为无效账户, 可能该用户密码已修改"
         params = [
             ("starttime", self.start_time),
             ("endtime", end_time),
@@ -94,6 +118,7 @@ class Badminton:
         self.loginSession.headers[
             "Referer"
         ] = f"http://pecg.hust.edu.cn/cggl/front/syqk?date={yesterday.strftime('%Y-%m-%d')}&type=1&cdbh=45"
+
         while True:
             date = datetime.datetime.strptime(
                 self.Date + " 08", "%Y-%m-%d %H"
