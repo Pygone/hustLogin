@@ -44,9 +44,13 @@ class Badminton:
         url = f"http://pecg.hust.edu.cn/cggl/front/syqk?date={yesterday.strftime('%Y-%m-%d')}&type=1&cdbh=45"
         res = self.loginSession.get(url)
         if self.partner is None:
-            self.partner = re.findall(
+            partners = re.findall(
                 "putPartner\('(.*)','(.*)','(.*)','(.*)'\);", res.text
-            )[0]
+            )
+            if len(partners) != 0:
+                self.partner = partners[0]
+            else:
+                return "您的账户未绑定同伴"
         cg_csrf_token = re.search(
             'name="cg_csrf_token" value="(.*)" />', res.text
         ).group(1)
