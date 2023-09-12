@@ -18,11 +18,13 @@ class Badminton:
             loginSession: LoginSession,
             Date: str,
             start_time: str,
-            cd: int = 1,
+            court: int = 1,
             partner: list = None,
     ):
         super().__init__()
-        self.cd = cd
+        self.token_2 = None
+        self.cg_csrf_token = None
+        self.court = str(court)
         s = datetime.datetime.strptime(start_time, "%H")
         self.start_time = s.strftime("%H:%M:%S")
         self.Date = Date
@@ -44,64 +46,23 @@ class Badminton:
             return True
         return False
 
-    def run(self) -> str:
-        if self.ecard():
-            return "电子账户余额不足"
-        Cd = json.load(open("src/court.json"))
-        date = datetime.datetime.strptime(self.Date, "%Y-%m-%d")
-        yesterday = date - datetime.timedelta(days=1)
-        end_time = datetime.datetime.strptime(
-            self.start_time, "%H:%M:%S"
-        ) + datetime.timedelta(hours=2)
-        end_time = end_time.strftime("%H:%M:%S")
-        url = self.loginSession.get("http://pecg.hust.edu.cn/cggl/index1").url
-        self.loginSession.headers["Referer"] = url
-        url = f"http://pecg.hust.edu.cn/cggl/front/syqk?date={yesterday.strftime('%Y-%m-%d')}&type=1&cdbh=45"
-        res = self.loginSession.get(url)
+    def getPartner(self, text):
+        params = {
+            "id": "0",
+            "member_id": "56558",
+            "partner_name": "",
+            "partner_type": "1",
+            "partner_schoolno": "",
+            "partner_passwd": "",
+            "cg_csrf_token": self.cg_csrf_token,
+            "token": self.token_2
+        }
         if self.partner is None:
             self.partners = re.findall(
-                "putPartner\('(.*)','(.*)','(.*)','(.*)'\);", res.text
+                "putPartner\('(.*)','(.*)','(.*)','(.*)'\);", text
             )
             if len(self.partners) == 0:
                 return "您的账户未绑定同伴"
-        cg_csrf_token = re.search(
-            'name="cg_csrf_token" value="(.*)" />', res.text
-        ).group(1)
-        token_1 = re.search(r'name=\\"token\\" value=\\"(.*)\\" >"', res.text).group(1)
-        params = {
-            "changdibh": "45",
-            "data": "110@08:00:00-10:00:00,133@08:00:00-10:00:00,215@08:00:00-10:00:00,216@08:00:00-10:00:00,"
-                    "218@08:00:00-10:00:00,376@08:00:00-10:00:00,217@08:00:00-10:00:00,219@08:00:00-10:00:00,"
-                    "220@08:00:00-10:00:00,221@08:00:00-10:00:00,222@08:00:00-10:00:00,223@08:00:00-10:00:00,"
-                    "224@08:00:00-10:00:00,368@08:00:00-10:00:00,369@08:00:00-10:00:00,370@08:00:00-10:00:00,"
-                    "377@08:00:00-10:00:00,371@08:00:00-10:00:00,372@08:00:00-10:00:00,373@08:00:00-10:00:00,"
-                    "374@08:00:00-10:00:00,375@08:00:00-10:00:00,",
-            "date": date.strftime("%Y-%m-%d"),
-            "time": time.strftime(
-                "%a %b %d %Y %H:%M:%S GMT+0800 (中国标准时间)", time.localtime()
-            ),
-            "token": token_1,
-        }
-        self.loginSession.headers[
-            "Referer"
-        ] = f"http://pecg.hust.edu.cn/cggl/front/syqk?date={yesterday.strftime('%Y-%m-%d')}&type=1&cdbh=45"
-        self.loginSession.headers["X-Requested-With"] = "XMLHttpRequest"
-        res = self.loginSession.post(
-            "http://pecg.hust.edu.cn/cggl/front/ajax/getsyzt", data=params
-        ).json()
-        self.loginSession.headers.pop("X-Requested-With")
-        token_2 = res[0]["token"]
-        if self.partner is None:
-            params = {
-                "id": "0",
-                "member_id": "56558",
-                "partner_name": "",
-                "partner_type": "1",
-                "partner_schoolno": "",
-                "partner_passwd": "",
-                "cg_csrf_token": cg_csrf_token,
-                "token": token_2
-            }
             for partner in self.partners:
                 if partner[2] == self.loginSession.userId:
                     return "不可将自己设置为同伴"
@@ -115,6 +76,43 @@ class Badminton:
                     break
             if self.partner is None:
                 return "您的账户绑定的同伴均为无效账户, 可能该用户密码已修改"
+
+    def run(self) -> str:
+        if self.ecard():
+            return "电子账户余额不足"
+        self.court = json.load(open("src/court.json"))[self.court]
+        date = datetime.datetime.strptime(self.Date, "%Y-%m-%d")
+        yesterday = date - datetime.timedelta(days=1)
+        end_time = (datetime.datetime.strptime(
+            self.start_time, "%H:%M:%S"
+        ) + datetime.timedelta(hours=2)).strftime("%H:%M:%S")
+        self.loginSession.headers["Referer"] = self.loginSession.get("http://pecg.hust.edu.cn/cggl/index1").url
+        url = f"http://pecg.hust.edu.cn/cggl/front/syqk?date={yesterday.strftime('%Y-%m-%d')}&type=1&cdbh=45"
+        text = self.loginSession.get(url).text
+        self.cg_csrf_token = re.search(
+            'name="cg_csrf_token" value="(.*)" />', text
+        ).group(1)
+        token = re.search(r'name=\\"token\\" value=\\"(.*)\\" >"', text).group(1)
+        params = {
+            "changdibh": "45",
+            "data": "110@08:00:00-10:00:00,133@08:00:00-10:00:00,215@08:00:00-10:00:00,216@08:00:00-10:00:00,"
+                    "218@08:00:00-10:00:00,376@08:00:00-10:00:00,217@08:00:00-10:00:00,219@08:00:00-10:00:00,"
+                    "220@08:00:00-10:00:00,221@08:00:00-10:00:00,222@08:00:00-10:00:00,223@08:00:00-10:00:00,"
+                    "224@08:00:00-10:00:00,368@08:00:00-10:00:00,369@08:00:00-10:00:00,370@08:00:00-10:00:00,"
+                    "377@08:00:00-10:00:00,371@08:00:00-10:00:00,372@08:00:00-10:00:00,373@08:00:00-10:00:00,"
+                    "374@08:00:00-10:00:00,375@08:00:00-10:00:00,",
+            "date": date.strftime("%Y-%m-%d"),
+            "time": time.strftime(
+                "%a %b %d %Y %H:%M:%S GMT+0800 (中国标准时间)", time.localtime()
+            ),
+            "token": token,
+        }
+        json_ = self.loginSession.post(
+            "http://pecg.hust.edu.cn/cggl/front/ajax/getsyzt", data=params, headers={
+                "X-Requested-With": "XMLHttpRequest",
+            }).json()
+        self.token_2 = json_[0]["token"]
+        self.getPartner(text)
         params = [
             ("starttime", self.start_time),
             ("endtime", end_time),
@@ -122,16 +120,12 @@ class Badminton:
             ("partnerName", self.partner[1]),
             ("partnerSchoolNo", self.partner[2]),
             ("partnerPwd", self.partner[0]),
-            ("choosetime", Cd[str(self.cd)]),
+            ("choosetime", self.court),
             ("changdibh", "45"),
             ("date", date.strftime("%Y-%m-%d")),
-            ("cg_csrf_token", cg_csrf_token),
-            ("token", token_2),
+            ("cg_csrf_token", self.cg_csrf_token),
+            ("token", self.token_2),
         ]
-        self.loginSession.headers[
-            "Referer"
-        ] = f"http://pecg.hust.edu.cn/cggl/front/syqk?date={yesterday.strftime('%Y-%m-%d')}&type=1&cdbh=45"
-
         while True:
             date = datetime.datetime.strptime(
                 self.Date + " 08", "%Y-%m-%d %H"
@@ -147,25 +141,18 @@ class Badminton:
                 else:
                     time.sleep(0.1)
                 continue
-        res = self.loginSession.post(
-            "http://pecg.hust.edu.cn/cggl/front/step2", data=params
-        )
+        text = self.loginSession.post("http://pecg.hust.edu.cn/cggl/front/step2", data=params).text
         try:
-            data = re.search('name="data" value="(.*)" type', res.text).group(1)
-            Id = re.search('name="id" value="(.*)" type', res.text).group(1)
+            data = re.search('name="data" value="(.*)" type', text).group(1)
+            Id = re.search('name="id" value="(.*)" type', text).group(1)
             params = [
                 ("data", data),
                 ("id", Id),
-                ("cg_csrf_token", cg_csrf_token),
-                ("token", token_2),
+                ("cg_csrf_token", self.cg_csrf_token),
+                ("token", self.token_2),
                 ("select_pay_type", -1),
             ]
-            self.loginSession.headers[
-                "Referer"
-            ] = "http://pecg.hust.edu.cn/cggl/front/step2"
-            res = self.loginSession.post(
-                "http://pecg.hust.edu.cn/cggl/front/step3", data=params
-            )
+            text = self.loginSession.post("http://pecg.hust.edu.cn/cggl/front/step3", data=params).text
         except AttributeError:
-            return re.search(r"alert\(HTMLDecode\('(.*)'\), '提示信息'\);", res.text).group(1)
-        return re.search(r"alert\(HTMLDecode\('(.*)'\), '提示信息'\);", res.text).group(1)
+            return re.search(r"alert\(HTMLDecode\('(.*)'\), '提示信息'\);", text).group(1)
+        return re.search(r"alert\(HTMLDecode\('(.*)'\), '提示信息'\);", text).group(1)
