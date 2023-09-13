@@ -52,6 +52,7 @@ class publicCourse:
             except:
                 print("存在冲突")
                 self.valid_list.remove(course_dict_)
+
     def run(self):
         self.loginSession.get("http://wsxk.hust.edu.cn/hustpass2.action")
         time.sleep(0.5)

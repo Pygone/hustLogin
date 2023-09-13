@@ -23,7 +23,7 @@ logging.basicConfig(
 
 class courseRobbing:
     def __init__(
-        self, loginSession: LoginSession, userId, course: dict, function: str = "Attack"
+            self, loginSession: LoginSession, userId, course: dict, function: str = "Attack"
     ):
         super().__init__()
         self.loginSession = loginSession
@@ -42,7 +42,7 @@ class courseRobbing:
     async def Postmethod(self, url, data, course, teacherNum):
         async with aiohttp.ClientSession() as session:
             async with session.post(
-                url=url, data=data, headers=self.loginSession.headers
+                    url=url, data=data, headers=self.loginSession.headers
             ) as response:
                 assert response.status == 200
                 json = await response.json()
@@ -56,10 +56,10 @@ class courseRobbing:
     async def getclassId(self, url, data, course):
         async with aiohttp.ClientSession() as session:
             async with session.post(
-                url=url,
-                data=data,
-                headers=self.loginSession.headers,
-                cookies=self.loginSession.cookies,
+                    url=url,
+                    data=data,
+                    headers=self.loginSession.headers,
+                    cookies=self.loginSession.cookies,
             ) as response:
                 assert response.status == 200
                 json = await response.json()
@@ -80,6 +80,9 @@ class courseRobbing:
             res_json = res.json()
         except JSONDecodeError:
             logging.error("Cookie 无效!")
+            sys.exit(-1)
+        if res_json["count"] == 0:
+            logging.error("时间选择有误?")
             sys.exit(-1)
         for i in res_json["data"]:
             for j in self.course.keys():
