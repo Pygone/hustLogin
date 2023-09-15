@@ -69,8 +69,8 @@ class Badminton:
                 params["partner_name"] = partner[1]
                 params["partner_schoolno"] = partner[2]
                 params["partner_passwd"] = partner[0]
-                text = self.loginSession.post("http://pecg.hust.edu.cn/cggl/front/addPartner", data=params)
-                info = re.search(r"alert\(HTMLDecode\('(.*)'\), '提示信息'\);", text.text).group(1)
+                text_ = self.loginSession.post("http://pecg.hust.edu.cn/cggl/front/addPartner", data=params).text
+                info = re.search(r"alert\(HTMLDecode\('(.*)'\), '提示信息'\);", text_).group(1)
                 if "你已添加该同伴，请勿重复添加" in info:
                     self.partner = partner
                     break
@@ -78,8 +78,8 @@ class Badminton:
                 return "您的账户绑定的同伴均为无效账户, 可能该用户密码已修改"
 
     def run(self) -> str:
-        if self.ecard():
-            return "电子账户余额不足"
+        # if self.ecard():
+        #     return "电子账户余额不足"
         self.court = json.load(open("src/court.json"))[self.court]
         date = datetime.datetime.strptime(self.Date, "%Y-%m-%d")
         yesterday = date - datetime.timedelta(days=1)
@@ -92,26 +92,6 @@ class Badminton:
         self.cg_csrf_token = re.search(
             'name="cg_csrf_token" value="(.*)" />', text
         ).group(1)
-        token = re.search(r'name=\\"token\\" value=\\"(.*)\\" >"', text).group(1)
-        params = {
-            "changdibh": "45",
-            "data": "110@08:00:00-10:00:00,133@08:00:00-10:00:00,215@08:00:00-10:00:00,216@08:00:00-10:00:00,"
-                    "218@08:00:00-10:00:00,376@08:00:00-10:00:00,217@08:00:00-10:00:00,219@08:00:00-10:00:00,"
-                    "220@08:00:00-10:00:00,221@08:00:00-10:00:00,222@08:00:00-10:00:00,223@08:00:00-10:00:00,"
-                    "224@08:00:00-10:00:00,368@08:00:00-10:00:00,369@08:00:00-10:00:00,370@08:00:00-10:00:00,"
-                    "377@08:00:00-10:00:00,371@08:00:00-10:00:00,372@08:00:00-10:00:00,373@08:00:00-10:00:00,"
-                    "374@08:00:00-10:00:00,375@08:00:00-10:00:00,",
-            "date": date.strftime("%Y-%m-%d"),
-            "time": time.strftime(
-                "%a %b %d %Y %H:%M:%S GMT+0800 (中国标准时间)", time.localtime()
-            ),
-            "token": token,
-        }
-        json_ = self.loginSession.post(
-            "http://pecg.hust.edu.cn/cggl/front/ajax/getsyzt", data=params, headers={
-                "X-Requested-With": "XMLHttpRequest",
-            }).json()
-        self.token_2 = json_[0]["token"]
         self.getPartner(text)
         params = [
             ("starttime", self.start_time),
@@ -124,22 +104,21 @@ class Badminton:
             ("changdibh", "45"),
             ("date", date.strftime("%Y-%m-%d")),
             ("cg_csrf_token", self.cg_csrf_token),
-            ("token", self.token_2),
         ]
+        date = datetime.datetime.strptime(
+            self.Date + " 08", "%Y-%m-%d %H"
+        ) - datetime.timedelta(days=2)
         while True:
-            date = datetime.datetime.strptime(
-                self.Date + " 08", "%Y-%m-%d %H"
-            ) - datetime.timedelta(days=2)
             diff = datetime.datetime.now() - date
             diff = diff.days * 86400 + diff.seconds
-            if diff > 0.1:
+            if diff >= 0:
                 break
             else:
                 logging.info(f"等待中, 剩余{-diff}secs 开始")
                 if -diff > 3:
                     time.sleep(-diff - 3)
                 else:
-                    time.sleep(0.1)
+                    time.sleep(0.05)
                 continue
         text = self.loginSession.post("http://pecg.hust.edu.cn/cggl/front/step2", data=params).text
         try:
@@ -149,7 +128,6 @@ class Badminton:
                 ("data", data),
                 ("id", Id),
                 ("cg_csrf_token", self.cg_csrf_token),
-                ("token", self.token_2),
                 ("select_pay_type", -1),
             ]
             text = self.loginSession.post("http://pecg.hust.edu.cn/cggl/front/step3", data=params).text
