@@ -78,8 +78,8 @@ class Badminton:
                 return "您的账户绑定的同伴均为无效账户, 可能该用户密码已修改"
 
     def run(self) -> str:
-        # if self.ecard():
-        #     return "电子账户余额不足"
+        if self.ecard():
+            return "电子账户余额不足"
         self.court = json.load(open("src/court.json"))[self.court]
         date = datetime.datetime.strptime(self.Date, "%Y-%m-%d")
         yesterday = date - datetime.timedelta(days=1)
@@ -105,20 +105,20 @@ class Badminton:
             ("date", date.strftime("%Y-%m-%d")),
             ("cg_csrf_token", self.cg_csrf_token),
         ]
-        date = datetime.datetime.strptime(
+        date = str(datetime.datetime.strptime(
             self.Date + " 08", "%Y-%m-%d %H"
-        ) - datetime.timedelta(days=2)
+        ) - datetime.timedelta(days=2))
+        date = time.mktime(time.strptime(date, "%Y-%m-%d %H:%M:%S"))
         while True:
-            diff = datetime.datetime.now() - date
-            diff = diff.days * 86400 + diff.seconds
+            diff = time.time() - date
             if diff >= 0:
                 break
             else:
-                logging.info(f"等待中, 剩余{-diff}secs 开始")
+                logging.info(f"等待中, 剩余{int(-diff)} secs 开始")
                 if -diff > 3:
                     time.sleep(-diff - 3)
                 else:
-                    time.sleep(0.05)
+                    time.sleep(0.001)
                 continue
         text = self.loginSession.post("http://pecg.hust.edu.cn/cggl/front/step2", data=params).text
         try:
