@@ -42,7 +42,7 @@ class courseRobbing:
     async def Postmethod(self, url, data, course, teacherNum):
         async with aiohttp.ClientSession() as session:
             async with session.post(
-                    url=url, data=data, headers=self.loginSession.headers
+                    url=url, data=data, headers=self.loginSession.headers, cookies=self.loginSession.cookies
             ) as response:
                 assert response.status == 200
                 json = await response.json()
@@ -200,7 +200,7 @@ class courseRobbing:
                             continue
                         logging.info("课堂人数仍为满, 继续等待!")
                         logging.info(datetime.now())
-            time.sleep(5)
+            time.sleep(1)
 
     def run(self, T: str):
         date = time.mktime(time.strptime(str(datetime.today().year) + "/" + T, "%Y/%m/%d/%H/%M"))
@@ -219,6 +219,7 @@ class courseRobbing:
                         time.sleep(0.001)
                     continue
         elif self.function == "Rob":
+            self.init_()
             self.RobClass()
 
     @staticmethod
