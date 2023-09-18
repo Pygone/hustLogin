@@ -55,11 +55,10 @@ class Badminton:
             "partner_schoolno": "",
             "partner_passwd": "",
             "cg_csrf_token": self.cg_csrf_token,
-            "token": self.token_2
         }
         if self.partner is None:
             self.partners = re.findall(
-                "putPartner\('(.*)','(.*)','(.*)','(.*)'\);", text
+                "putPartner\('(.*)','(.*)','(.*)','1'\);", text
             )
             if len(self.partners) == 0:
                 return "您的账户未绑定同伴"

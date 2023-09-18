@@ -203,23 +203,20 @@ class courseRobbing:
             time.sleep(5)
 
     def run(self, T: str):
-        self.init_()
+        date = time.mktime(time.strptime(str(datetime.today().year) + "/" + T, "%Y/%m/%d/%H/%M"))
         if self.function == "Attack":
             while True:
-                date = datetime.strptime(
-                    str(datetime.today().year) + "/" + T, "%Y/%m/%d/%H/%M"
-                )
-                diff = datetime.now() - date
-                diff = diff.days * 86400 + diff.seconds
-                if diff > 1:
+                diff = time.time() - date
+                if diff > 0:
+                    self.init_()
                     self.mutiPost()
                     break
                 else:
-                    logging.info(f"等待中, 剩余{-diff}secs 开始自动抢课")
-                    if -diff > 10:
-                        time.sleep(-diff - 10)
+                    logging.info(f"等待中, 剩余{int(-diff)} secs 开始")
+                    if -diff > 3:
+                        time.sleep(-diff - 3)
                     else:
-                        time.sleep(1)
+                        time.sleep(0.001)
                     continue
         elif self.function == "Rob":
             self.RobClass()
