@@ -62,7 +62,7 @@ in this session, user can post the request to select the course by script which 
 func param only support "Attack" because the hust platform recently split the withdraw operation and select operation.
 
 ```python
-operation.course({"图神经网络": "万瑶"}, "2021-09-20 08:00:00", "Attack")
+operation.course({"图神经网络": "万瑶"}, "09/28/13/00", "Attack")
 ```
 
 ### badminton court select
