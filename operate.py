@@ -4,78 +4,36 @@ import time
 from LoginSession import LoginSession
 from Operation.badminton import Badminton
 from Operation.course import Course
-from Operation.courseRobbing import courseRobbing
-from Operation.professionalCourse import professionalCourse
-from Operation.publicCourse import publicCourse
+from Operation.courseRobbing import CourseRobbing
+from Operation.professionalCourse import ProfessionalCourse
+from Operation.publicCourse import PublicCourse
 from Operation.transcript import Transcript
 
 
-class operator:
-    def __init__(self, loginSession: LoginSession, userId: str):
-        """
-
-        :param loginSession: 华中大客户端
-        :param userId: 用户名
-        """
-        self.__userId = userId
-        self.__loginSession = loginSession
+class Operator:
+    def __init__(self, login_session: LoginSession, user_id: str):
+        self.user_id = user_id
+        self.login_session = login_session
 
     def course(self, course: dict, time_: str = "", function: str = "Attack"):
-        """
-        专业选修课 抢课插件
-        :param course: 课程:教师名
-        :param time_: 开始选课的时间
-        :param function: 可选参数
-               Attack 准点抢课
-               Rob 后台自动等待退选抢课 ( 由于选课机制更改 已失效)
-        :return:
-        """
-        course = courseRobbing(self.__loginSession, self.__userId, course, function)
+        course = CourseRobbing(self.login_session, self.user_id, course, function)
         course.run(time_)
 
     def transcript(self, query: str = None) -> dict:
-        """
-        成绩单查询
-        :param query: 查询成绩的课程名, 如不设置则返回所有课程
-        :return:
-        """
-        transcript = Transcript(self.__loginSession, query)
+        transcript = Transcript(self.login_session, query)
         return transcript.run()
 
     def schedule(self):
-        """
-        课程表数据查询
-        :return: 返回个人的课程表数据 json格式
-        """
-        return Course(self.__loginSession).schedule()
+        return Course(self.login_session).schedule()
 
-    def badminton(self, Date: str, start_time: str, cd: int = 1, partner: list = None) -> str:
-        """
-        羽毛球场预约
-        :param Date: 预约的日期 "%Y-%m-%d"
-        :param start_time: 预约场地的时间段开始节点 %H: 08-20( 指8点场 - 20点场)
-        :param cd: 场地号 1-22
-        :param partner: 同伴(可选) 不填则自动选择之前注册过的第一个同伴
-        :return:
-        """
-        if partner is None:
-            badminton = Badminton(self.__loginSession, Date, start_time, cd)
-        else:
-            badminton = Badminton(self.__loginSession, Date, start_time, cd, partner)
+    def badminton(self, date: str, start_time: str, cd: int = 1, partner: list = None) -> str:
+        badminton = Badminton(self.login_session, date, start_time, cd, partner)
         return badminton.run()
 
     def school_card(self, val: int, password: str) -> str:
-        """
-        校园卡充值
-        :param val: 充值的余额
-        :param password: 校园卡密码
-        :return: 充值反馈信息
-        """
-        res = self.__loginSession.get(
-            "http://ecard.m.hust.edu.cn/wechat-web/ChZhController/ChongZhiurl.html"
-        )
+        res = self.login_session.get("http://ecard.m.hust.edu.cn/wechat-web/ChZhController/ChongZhiurl.html")
         cardno = re.search('id="cardno" value="(.*)"/>', res.text).group(1)
-        res = self.__loginSession.post(
+        res = self.login_session.post(
             "http://ecard.m.hust.edu.cn/wechat-web/ChZhController/ChongZhi.html",
             data={
                 "jsoncallback": "jsonp" + str(int(time.time() * 1000)),
@@ -87,8 +45,8 @@ class operator:
         return re.search('"errmsg":"(.*?)"', res.text).group(1)
 
     def professional_credit(self):
-        return professionalCourse(self.__loginSession)
+        return ProfessionalCourse(self.login_session)
 
     def public_course(self, query: list):
-        worker = publicCourse(self.__loginSession, query)
+        worker = PublicCourse(self.login_session, query)
         worker.run()

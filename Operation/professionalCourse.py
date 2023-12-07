@@ -1,30 +1,25 @@
-class professionalCourse:
-    def __init__(self, loginSession):
-        self.loginSession = loginSession
+class ProfessionalCourse:
+    def __init__(self, login_session):
+        self.login_session = login_session
         self.course_credit = {}
-        self.init()
+        self.populate_course_credit()
 
-    def init(self):
-        self.loginSession.get("http://hubs.hust.edu.cn/hustpass.action")
-        res = self.loginSession.post(
+    def populate_course_credit(self):
+        self.login_session.get("http://hubs.hust.edu.cn/hustpass.action")
+        response = self.login_session.post(
             "http://hubs.hust.edu.cn/plan/Plan_queryPlanModuleCourse.action",
             data={"nj": "2021", "zybh": "004068", "mkid": "2708"},
         )
-        for i in res.json()["data"]:
-            self.course_credit[i["KCMC"]] = []
-            self.course_credit[i["KCMC"]].append(i["KCZXF"])
-            temp = self.loginSession.post(
+        for course in response.json()["data"]:
+            self.course_credit[course["KCMC"]] = [course["KCZXF"]]
+            temp = self.login_session.post(
                 "http://hubs.hust.edu.cn/plan/Plan_queryXdbj.action",
-                data={"kcbh": i["KCBH"]},
+                data={"kcbh": course["KCBH"]},
             )
-            self.course_credit[i["KCMC"]].append(temp.json()["result"])
+            self.course_credit[course["KCMC"]].append(temp.json()["result"])
 
-    def sum(self) -> int:
-        sum_credit = 0
-        for i in self.course_credit.values():
-            if i[1]:
-                sum_credit += i[0]
-        return sum_credit
+    def total_credit(self) -> int:
+        return sum(credit[0] for credit in self.course_credit.values() if credit[1])
 
-    def detail(self) -> dict:
+    def course_details(self) -> dict:
         return self.course_credit

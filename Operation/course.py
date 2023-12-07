@@ -6,40 +6,29 @@ from LoginSession import LoginSession
 
 
 class Course:
-    def __init__(self, loginSession: LoginSession):
-        super().__init__()
-        self.loginSession = loginSession
-        self.Courses = {}
-        self.func()
+    def __init__(self, login_session: LoginSession):
+        self.login_session = login_session
+        self.courses = {}
+        self.populate_courses()
 
-    def add(self, text: str):
+    def add_course(self, text: str):
         lines = text.split("\n")
-        courseName = lines[0]
-        teacherName = lines[2]
-        idx = 10
+        course_name = lines[0]
+        teacher_name = lines[2]
         schedule = {"周次": [], "星期": [], "节次": [], "地点": []}
-        scheduleKeys = list(schedule.keys())
-        while idx < len(lines):
-            for i in range(len(scheduleKeys)):
-                schedule[scheduleKeys[i]].append(lines[idx + i])
-            idx += 4
-        Course = {"teacherName": teacherName, "schedule": schedule}
-        self.Courses[courseName] = Course
+        for idx in range(10, len(lines), 4):
+            for i, key in enumerate(schedule.keys()):
+                schedule[key].append(lines[idx + i])
+        self.courses[course_name] = {"teacherName": teacher_name, "schedule": schedule}
 
-    def func(self):
-        res = self.loginSession.get(
-            "http://hub.m.hust.edu.cn/kcb/todate/namecourse.action?kcname=&lsname="
-        )
+    def populate_courses(self):
+        res = self.login_session.get("http://hub.m.hust.edu.cn/kcb/todate/namecourse.action?kcname=&lsname=")
         soup = BeautifulSoup(res.text, features="html.parser")
-        res = soup.find_all("li")
-        for i in res:
-            t = re.sub("\r|\t", "", i.text).strip()
-            t = t.replace(" ", "")
-            t = re.sub("\n+", "\n", t)
-            pattern = re.compile("人数/容量：(.*)\n开课对象", re.DOTALL)
-            temp = re.search(pattern, t).group(1)
-            t = t.replace(temp, temp.replace("\n", ""))
-            self.add(t)
+        for i in soup.find_all("li"):
+            text = re.sub("\r|\t", "", i.text).strip().replace(" ", "").replace("\n+", "\n")
+            temp = re.search("人数/容量：(.*)\n开课对象", text, re.DOTALL).group(1)
+            text = text.replace(temp, temp.replace("\n", ""))
+            self.add_course(text)
 
-    def schedule(self):
-        return self.Courses
+    def get_courses(self):
+        return self.courses
