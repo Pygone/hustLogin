@@ -1,28 +1,230 @@
-<!DOCTYPE html SYSTEM "about:legacy-compat"><html lang="en-US" data-colors-preset="contrast" data-primary-color="#307FFF"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="robots" content="noindex">  <meta name="built-on" content="2023-11-29T09:21:13.5740068"><meta name="build-number" content="${buildNumber}">       <title>Hust: 一个用于Hust平台的Python工具 | Hust Login</title><script id="virtual-toc-data" type="application/json">[{"id":"table-of-contents","level":0,"title":"目录","anchor":"#table-of-contents"},{"id":"dependencies","level":0,"title":"依赖","anchor":"#dependencies"},{"id":"usage","level":0,"title":"使用方法","anchor":"#usage"}]</script><script id="topic-shortcuts" type="application/json"></script><link href="https://resources.jetbrains.com/writerside/apidoc/6.1.5-b176/app.css" rel="stylesheet">   <link rel="apple-touch-icon" sizes="180x180" href="https://jetbrains.com/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="https://jetbrains.com/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="https://jetbrains.com/favicon-16x16.png"><link rel="manifest" href="https://jetbrains.com/site.webmanifest"><link rel="mask-icon" href="https://jetbrains.com/safari-pinned-tab.svg" color="#000000"><meta name="msapplication-TileColor" content="#000000"/><meta name="msapplication-TileImage" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-144x144.png"/><meta name="msapplication-square70x70logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-70x70.png"/><meta name="msapplication-square150x150logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-150x150.png"/><meta name="msapplication-wide310x150logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-310x150.png"/><meta name="msapplication-square310x310logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-310x310.png"/>  <meta name="image" content=""><!-- Open Graph --><meta property="og:title" content="Hust: 一个用于Hust平台的Python工具 | Hust Login"/><meta property="og:description" content=""/><meta property="og:image" content=""/><meta property="og:site_name" content="Hust Login Help"/><meta property="og:type" content="website"/><meta property="og:locale" content="en_US"/><meta property="og:url" content="chinese-version.html"/><!-- End Open Graph --><!-- Twitter Card --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:site" content=""><meta name="twitter:title" content="Hust: 一个用于Hust平台的Python工具 | Hust Login"><meta name="twitter:description" content=""><meta name="twitter:creator" content=""><meta name="twitter:image:src" content=""><!-- End Twitter Card --><!-- Schema.org WebPage --><script type="application/ld+json"> { "@context": "http://schema.org", "@type": "WebPage", "@id": "chinese-version.html#webpage", "url": "chinese-version.html", "name": "Hust: 一个用于Hust平台的Python工具 | Hust Login", "description": "", "image": "", "inLanguage":"en-US" }</script><!-- End Schema.org --><!-- Schema.org WebSite --><script type="application/ld+json"> { "@type": "WebSite", "@id": "/#website", "url": "/", "name": "Hust Login Help" }</script><!-- End Schema.org --> <!-- Mermaid light/dark themes -->  <link rel="stylesheet" type="text/css" href="mermaid.css">  </head>     <body data-id="Empty" data-main-title="Hust: 一个用于Hust平台的Python工具" data-article-props="{&quot;seeAlsoStyle&quot;:&quot;links&quot;}"  data-template="article"  data-breadcrumbs=""  >   <div class="wrapper"><main class="panel _main"><header class="panel__header"><div class="container"><h3>Hust Login  Help</h3><div class="panel-trigger"></div></div></header><section class="panel__content"><div class="container"><article class="article" data-shortcut-switcher="inactive"><h1 data-toc="Empty"  id="Chinese-version.topic"  >Hust: 一个用于Hust平台的Python工具</h1>  <p id="be1e69b4_473">此仓库包含一个用于与Hust平台交互的Python工具。它包括登录、排课、选择羽毛球场地、充值校园卡等功能。</p><section class="chapter"><h2 id="table-of-contents" data-toc="table-of-contents">目录</h2><ul class="list _ul" id="be1e69b4_474"    ><li class="list__item" id="be1e69b4_475"><p><a href="#dependencies" id="be1e69b4_476" data-tooltip="使用pip安装所需的Python包："  >依赖</a></p></li><li class="list__item" id="be1e69b4_477"><p><a href="#usage" id="be1e69b4_478" data-tooltip="使用LoginSession类登录Hust平台并获取用户会话。"  >使用方法</a></p><ul class="list _ul" id="be1e69b4_479"    ><li class="list__item" id="be1e69b4_480"><p><a href="#logging-in" id="be1e69b4_481" data-tooltip="使用LoginSession类登录Hust平台并获取用户会话。"  >登录</a></p></li><li class="list__item" id="be1e69b4_482"><p><a href="#course-schedule" id="be1e69b4_483" data-tooltip="以JSON格式获取用户的课程表。"  >课程表</a></p></li><li class="list__item" id="be1e69b4_484"><p><a href="#course-score" id="be1e69b4_485" data-tooltip="以JSON格式获取用户的课程成绩。"  >课程成绩</a></p></li><li class="list__item" id="be1e69b4_486"><p><a href="#automating-professional-course-selection" id="be1e69b4_487" data-tooltip="自动选择课程的过程。这比手动选择快得多。"  >自动选择专业课程</a></p></li><li class="list__item" id="be1e69b4_488"><p><a href="#automating-badminton-court-selection" id="be1e69b4_489" data-tooltip="自动选择羽毛球场地的过程。这比手动选择快得多。伙伴是可选的，如果你想指定你的朋友，你可以在列表中添加伙伴信息，格式为[&quot;密码&quot;, &quot;姓名&quot;, &quot;学校ID&quot;]，或者脚本会选择你之前设置的第一个伙伴。"  >自动选择羽毛球场地</a></p></li><li class="list__item" id="be1e69b4_490"><p><a href="#professional-course-credit" id="be1e69b4_491" data-tooltip="获取用户的专业课程学分。"  >专业课程学分</a></p></li><li class="list__item" id="be1e69b4_492"><p><a href="#automating-public-course-selection" id="be1e69b4_493" data-tooltip="自动选择公共课程的过程。这比手动选择快得多。"  >自动选择公共课程</a></p></li></ul></li></ul></section><section class="chapter"><h2 id="dependencies" data-toc="dependencies">依赖</h2><section class="chapter"><h3 id="python-dependencies" data-toc="python-dependencies">Python依赖</h3><p id="be1e69b4_494">使用pip安装所需的Python包：</p><div class="code-block" data-lang="bash"         >
-                pip install -r requirements.txt
-            </div></section><section class="chapter"><h3 id="ocr-dependencies" data-toc="ocr-dependencies">OCR依赖</h3><p id="be1e69b4_496">安装<a href="https://github.com/tesseract-ocr/tesseract" id="be1e69b4_497"   data-external="true" rel="noopener noreferrer" >tesseract</a>并将其添加到环境变量中。</p></section></section><section class="chapter"><h2 id="usage" data-toc="usage">使用方法</h2><section class="chapter"><h3 id="logging-in" data-toc="logging-in">登录</h3><p id="be1e69b4_498">使用LoginSession类登录Hust平台并获取用户会话。</p><div class="code-block" data-lang="python"         >
-                from LoginSession import LoginSession
+<!DOCTYPE html SYSTEM "about:legacy-compat">
+<html lang="en-US" data-colors-preset="contrast" data-primary-color="#307FFF">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <meta name="robots" content="noindex">
+    <meta name="built-on" content="2023-11-29T09:21:13.5740068">
+    <meta name="build-number" content="${buildNumber}">
+    <title>Hust: 一个用于Hust平台的Python工具 | Hust Login</title>
+    <script id="virtual-toc-data" type="application/json">[
+        {
+            "id": "table-of-contents",
+            "level": 0,
+            "title": "目录",
+            "anchor": "#table-of-contents"
+        },
+        {
+            "id": "dependencies",
+            "level": 0,
+            "title": "依赖",
+            "anchor": "#dependencies"
+        },
+        {
+            "id": "usage",
+            "level": 0,
+            "title": "使用方法",
+            "anchor": "#usage"
+        }
+    ]</script>
+    <script id="topic-shortcuts" type="application/json"></script>
+    <link href="https://resources.jetbrains.com/writerside/apidoc/6.1.5-b176/app.css" rel="stylesheet">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://jetbrains.com/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://jetbrains.com/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://jetbrains.com/favicon-16x16.png">
+    <link rel="manifest" href="https://jetbrains.com/site.webmanifest">
+    <link rel="mask-icon" href="https://jetbrains.com/safari-pinned-tab.svg" color="#000000">
+    <meta name="msapplication-TileColor" content="#000000"/>
+    <meta name="msapplication-TileImage"
+          content="https://resources.jetbrains.com/storage/ui/favicons/mstile-144x144.png"/>
+    <meta name="msapplication-square70x70logo"
+          content="https://resources.jetbrains.com/storage/ui/favicons/mstile-70x70.png"/>
+    <meta name="msapplication-square150x150logo"
+          content="https://resources.jetbrains.com/storage/ui/favicons/mstile-150x150.png"/>
+    <meta name="msapplication-wide310x150logo"
+          content="https://resources.jetbrains.com/storage/ui/favicons/mstile-310x150.png"/>
+    <meta name="msapplication-square310x310logo"
+          content="https://resources.jetbrains.com/storage/ui/favicons/mstile-310x310.png"/>
+    <meta name="image" content=""><!-- Open Graph -->
+    <meta property="og:title" content="Hust: 一个用于Hust平台的Python工具 | Hust Login"/>
+    <meta property="og:description" content=""/>
+    <meta property="og:image" content=""/>
+    <meta property="og:site_name" content="Hust Login Help"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:locale" content="en_US"/>
+    <meta property="og:url" content="chinese-version.html"/><!-- End Open Graph --><!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="">
+    <meta name="twitter:title" content="Hust: 一个用于Hust平台的Python工具 | Hust Login">
+    <meta name="twitter:description" content="">
+    <meta name="twitter:creator" content="">
+    <meta name="twitter:image:src" content=""><!-- End Twitter Card --><!-- Schema.org WebPage -->
+    <script type="application/ld+json"> {
+        "@context": "http://schema.org",
+        "@type": "WebPage",
+        "@id": "chinese-version.html#webpage",
+        "url": "chinese-version.html",
+        "name": "Hust: 一个用于Hust平台的Python工具 | Hust Login",
+        "description": "",
+        "image": "",
+        "inLanguage": "en-US"
+    }</script><!-- End Schema.org --><!-- Schema.org WebSite -->
+    <script type="application/ld+json"> {
+        "@type": "WebSite",
+        "@id": "/#website",
+        "url": "/",
+        "name": "Hust Login Help"
+    }</script><!-- End Schema.org --> <!-- Mermaid light/dark themes -->
+    <link rel="stylesheet" type="text/css" href="mermaid.css">
+</head>
+<body data-id="Empty" data-main-title="Hust: 一个用于Hust平台的Python工具"
+      data-article-props="{&quot;seeAlsoStyle&quot;:&quot;links&quot;}" data-template="article" data-breadcrumbs="">
+<div class="wrapper">
+    <main class="panel _main">
+        <header class="panel__header">
+            <div class="container"><h3>Hust Login Help</h3>
+                <div class="panel-trigger"></div>
+            </div>
+        </header>
+        <section class="panel__content">
+            <div class="container">
+                <article class="article" data-shortcut-switcher="inactive"><h1 data-toc="Empty"
+                                                                               id="Chinese-version.topic">Hust:
+                    一个用于Hust平台的Python工具</h1>
+                    <p id="be1e69b4_473">
+                        此仓库包含一个用于与Hust平台交互的Python工具。它包括登录、排课、选择羽毛球场地、充值校园卡等功能。</p>
+                    <section class="chapter"><h2 id="table-of-contents" data-toc="table-of-contents">目录</h2>
+                        <ul class="list _ul" id="be1e69b4_474">
+                            <li class="list__item" id="be1e69b4_475"><p><a href="#dependencies" id="be1e69b4_476"
+                                                                           data-tooltip="使用pip安装所需的Python包：">依赖</a>
+                            </p></li>
+                            <li class="list__item" id="be1e69b4_477"><p><a href="#usage" id="be1e69b4_478"
+                                                                           data-tooltip="使用LoginSession类登录Hust平台并获取用户会话。">使用方法</a>
+                            </p>
+                                <ul class="list _ul" id="be1e69b4_479">
+                                    <li class="list__item" id="be1e69b4_480"><p><a href="#logging-in" id="be1e69b4_481"
+                                                                                   data-tooltip="使用LoginSession类登录Hust平台并获取用户会话。">登录</a>
+                                    </p></li>
+                                    <li class="list__item" id="be1e69b4_482"><p><a href="#course-schedule"
+                                                                                   id="be1e69b4_483"
+                                                                                   data-tooltip="以JSON格式获取用户的课程表。">课程表</a>
+                                    </p></li>
+                                    <li class="list__item" id="be1e69b4_484"><p><a href="#course-score"
+                                                                                   id="be1e69b4_485"
+                                                                                   data-tooltip="以JSON格式获取用户的课程成绩。">课程成绩</a>
+                                    </p></li>
+                                    <li class="list__item" id="be1e69b4_486"><p><a
+                                            href="#automating-professional-course-selection" id="be1e69b4_487"
+                                            data-tooltip="自动选择课程的过程。这比手动选择快得多。">自动选择专业课程</a>
+                                    </p></li>
+                                    <li class="list__item" id="be1e69b4_488"><p><a
+                                            href="#automating-badminton-court-selection" id="be1e69b4_489"
+                                            data-tooltip="自动选择羽毛球场地的过程。这比手动选择快得多。伙伴是可选的，如果你想指定你的朋友，你可以在列表中添加伙伴信息，格式为[&quot;密码&quot;, &quot;姓名&quot;, &quot;学校ID&quot;]，或者脚本会选择你之前设置的第一个伙伴。">自动选择羽毛球场地</a>
+                                    </p></li>
+                                    <li class="list__item" id="be1e69b4_490"><p><a href="#professional-course-credit"
+                                                                                   id="be1e69b4_491"
+                                                                                   data-tooltip="获取用户的专业课程学分。">专业课程学分</a>
+                                    </p></li>
+                                    <li class="list__item" id="be1e69b4_492"><p><a
+                                            href="#automating-public-course-selection" id="be1e69b4_493"
+                                            data-tooltip="自动选择公共课程的过程。这比手动选择快得多。">自动选择公共课程</a>
+                                    </p></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </section>
+                    <section class="chapter"><h2 id="dependencies" data-toc="dependencies">依赖</h2>
+                        <section class="chapter"><h3 id="python-dependencies" data-toc="python-dependencies">
+                            Python依赖</h3>
+                            <p id="be1e69b4_494">使用pip安装所需的Python包：</p>
+                            <div class="code-block" data-lang="bash">
+                                pip install -r requirements.txt
+                            </div>
+                        </section>
+                        <section class="chapter"><h3 id="ocr-dependencies" data-toc="ocr-dependencies">OCR依赖</h3>
+                            <p id="be1e69b4_496">安装<a href="https://github.com/tesseract-ocr/tesseract"
+                                                        id="be1e69b4_497" data-external="true"
+                                                        rel="noopener noreferrer">tesseract</a>并将其添加到环境变量中。
+                            </p></section>
+                    </section>
+                    <section class="chapter"><h2 id="usage" data-toc="usage">使用方法</h2>
+                        <section class="chapter"><h3 id="logging-in" data-toc="logging-in">登录</h3>
+                            <p id="be1e69b4_498">使用LoginSession类登录Hust平台并获取用户会话。</p>
+                            <div class="code-block" data-lang="python">
+                                from LoginSession import LoginSession
 
-                userId = &quot;xxx&quot;
-                password = &quot;xxx&quot;
-                session = LoginSession(userId=userId, password=password)
-            </div><p id="be1e69b4_500">使用Operator类在Hust平台上执行操作。</p><div class="code-block" data-lang="python"         >
-                from operate import operator
+                                userId = &quot;xxx&quot;
+                                password = &quot;xxx&quot;
+                                session = LoginSession(userId=userId, password=password)
+                            </div>
+                            <p id="be1e69b4_500">使用Operator类在Hust平台上执行操作。</p>
+                            <div class="code-block" data-lang="python">
+                                from operate import Operator
 
-                operation = operator(session, userId)
-            </div></section><section class="chapter"><h3 id="course-schedule" data-toc="course-schedule">课程表</h3><p id="be1e69b4_502">以JSON格式获取用户的课程表。</p><div class="code-block" data-lang="python"         >
-                course_info = operation.schedule() # course_info是一个json对象，包含用户的课程表。
-            </div></section><section class="chapter"><h3 id="course-score" data-toc="course-score">课程成绩</h3><p id="be1e69b4_504">以JSON格式获取用户的课程成绩。</p><div class="code-block" data-lang="python"         >
-                course_score = operation.transcript() # course_score是一个json对象，包含用户的课程成绩。
-            </div></section><section class="chapter"><h3 id="automating-professional-course-selection" data-toc="automating-professional-course-selection">自动选择专业课程</h3><p id="be1e69b4_506">自动选择课程的过程。这比手动选择快得多。</p><div class="code-block" data-lang="python"         >
-                operation.course({&quot;图神经网络&quot;: &quot;万瑶&quot;}, &quot;09/20/18/00&quot;, &quot;Attack&quot;)
-            </div></section><section class="chapter"><h3 id="automating-badminton-court-selection" data-toc="automating-badminton-court-selection">自动选择羽毛球场地</h3><p id="be1e69b4_508">自动选择羽毛球场地的过程。这比手动选择快得多。伙伴是可选的，如果你想指定你的朋友，你可以在列表中添加伙伴信息，格式为[&quot;密码&quot;, &quot;姓名&quot;, &quot;学校ID&quot;]，或者脚本会选择你之前设置的第一个伙伴。</p><div class="code-block" data-lang="python"         >
-                operation.badminton(&quot;2021-09-20&quot;, &quot;08&quot;, 1, partner=[&quot;password&quot;, &quot;name&quot;,
-                &quot;schoolId&quot;])
-                operation.badminton(&quot;2021-09-20&quot;, &quot;08&quot;, 1)
-                # 两者都可以正常工作
-            </div></section><section class="chapter"><h3 id="professional-course-credit" data-toc="professional-course-credit">专业课程学分</h3><p id="be1e69b4_510">获取用户的专业课程学分。</p><div class="code-block" data-lang="python"         >
-                course_credit = operation.professional_credit()
-            </div></section><section class="chapter"><h3 id="automating-public-course-selection" data-toc="automating-public-course-selection">自动选择公共课程</h3><p id="be1e69b4_512">自动选择公共课程的过程。这比手动选择快得多。</p><div class="code-block" data-lang="python"         >
-                operation.public_course([&quot;节奏世界&quot;])
-            </div></section></section><div class="last-modified"> Last modified: 29 十一月 2023</div><div data-feedback-placeholder="true"></div><div class="navigation-links _bottom">  <a class="navigation-links__prev" href="empty.html">Hust: A Python Tool for the Hust Platform</a>   </div></article><div id="disqus_thread"></div></div></section></main></div>  <script src="https://resources.jetbrains.com/writerside/apidoc/6.1.5-b176/app.js"></script></body></html>
+                                operation = Operator(session, userId)
+                            </div>
+                        </section>
+                        <section class="chapter"><h3 id="course-schedule" data-toc="course-schedule">课程表</h3>
+                            <p id="be1e69b4_502">以JSON格式获取用户的课程表。</p>
+                            <div class="code-block" data-lang="python">
+                                course_info = operation.get_schedule() # course_info是一个json对象，包含用户的课程表。
+                            </div>
+                        </section>
+                        <section class="chapter"><h3 id="course-score" data-toc="course-score">课程成绩</h3>
+                            <p id="be1e69b4_504">以JSON格式获取用户的课程成绩。</p>
+                            <div class="code-block" data-lang="python">
+                                course_score = operation.transcript() # course_score是一个json对象，包含用户的课程成绩。
+                            </div>
+                        </section>
+                        <section class="chapter"><h3 id="automating-professional-course-selection"
+                                                     data-toc="automating-professional-course-selection">
+                            自动选择专业课程</h3>
+                            <p id="be1e69b4_506">自动选择课程的过程。这比手动选择快得多。</p>
+                            <div class="code-block" data-lang="python">
+                                operation.course({&quot;图神经网络&quot;: &quot;万瑶&quot;}, &quot;09/20/18/00&quot;,
+                                &quot;Attack&quot;)
+                            </div>
+                        </section>
+                        <section class="chapter"><h3 id="automating-badminton-court-selection"
+                                                     data-toc="automating-badminton-court-selection">
+                            自动选择羽毛球场地</h3>
+                            <p id="be1e69b4_508">自动选择羽毛球场地的过程。这比手动选择快得多。伙伴是可选的，如果你想指定你的朋友，你可以在列表中添加伙伴信息，格式为[&quot;密码&quot;,
+                                &quot;姓名&quot;, &quot;学校ID&quot;]，或者脚本会选择你之前设置的第一个伙伴。</p>
+                            <div class="code-block" data-lang="python">
+                                operation.badminton(&quot;2021-09-20&quot;, &quot;08&quot;, 1, partner=[&quot;password&quot;,
+                                &quot;name&quot;,
+                                &quot;schoolId&quot;])
+                                operation.badminton(&quot;2021-09-20&quot;, &quot;08&quot;, 1)
+                                # 两者都可以正常工作
+                            </div>
+                        </section>
+                        <section class="chapter"><h3 id="professional-course-credit"
+                                                     data-toc="professional-course-credit">专业课程学分</h3>
+                            <p id="be1e69b4_510">获取用户的专业课程学分。</p>
+                            <div class="code-block" data-lang="python">
+                                course_credit = operation.professional_credit()
+                                detail = course_credit.course_details()
+                                total = course_credit.total_credit()
+                            </div>
+                        </section>
+                        <section class="chapter"><h3 id="automating-public-course-selection"
+                                                     data-toc="automating-public-course-selection">自动选择公共课程</h3>
+                            <p id="be1e69b4_512">自动选择公共课程的过程。这比手动选择快得多。</p>
+                            <div class="code-block" data-lang="python">
+                                operation.public_course([&quot;节奏世界&quot;])
+                            </div>
+                        </section>
+                    </section>
+                    <div class="last-modified"> Last modified: 29 十一月 2023</div>
+                    <div data-feedback-placeholder="true"></div>
+                    <div class="navigation-links _bottom"><a class="navigation-links__prev" href="empty.html">Hust: A
+                        Python Tool for the Hust Platform</a></div>
+                </article>
+                <div id="disqus_thread"></div>
+            </div>
+        </section>
+    </main>
+</div>
+<script src="https://resources.jetbrains.com/writerside/apidoc/6.1.5-b176/app.js"></script>
+</body>
+</html>

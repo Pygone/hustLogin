@@ -23,8 +23,8 @@ class Operator:
         transcript = Transcript(self.login_session, query)
         return transcript.run()
 
-    def schedule(self):
-        return Course(self.login_session).schedule()
+    def get_schedule(self):
+        return Course(self.login_session).get_courses()
 
     def badminton(self, date: str, start_time: str, cd: int = 1, partner: list = None) -> str:
         badminton = Badminton(self.login_session, date, start_time, cd, partner)

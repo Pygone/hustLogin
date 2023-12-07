@@ -1,30 +1,244 @@
-<!DOCTYPE html SYSTEM "about:legacy-compat"><html lang="en-US" data-colors-preset="contrast" data-primary-color="#307FFF"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta charset="UTF-8"><meta name="robots" content="noindex">  <meta name="built-on" content="2023-11-29T09:21:13.5742063"><meta name="build-number" content="${buildNumber}">       <title>Hust: A Python Tool for the Hust Platform | Hust Login</title><script id="virtual-toc-data" type="application/json">[{"id":"table-of-contents","level":0,"title":"Table of Contents","anchor":"#table-of-contents"},{"id":"dependencies","level":0,"title":"Dependencies","anchor":"#dependencies"},{"id":"usage","level":0,"title":"Usage","anchor":"#usage"}]</script><script id="topic-shortcuts" type="application/json"></script><link href="https://resources.jetbrains.com/writerside/apidoc/6.1.5-b176/app.css" rel="stylesheet">   <link rel="apple-touch-icon" sizes="180x180" href="https://jetbrains.com/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="https://jetbrains.com/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="https://jetbrains.com/favicon-16x16.png"><link rel="manifest" href="https://jetbrains.com/site.webmanifest"><link rel="mask-icon" href="https://jetbrains.com/safari-pinned-tab.svg" color="#000000"><meta name="msapplication-TileColor" content="#000000"/><meta name="msapplication-TileImage" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-144x144.png"/><meta name="msapplication-square70x70logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-70x70.png"/><meta name="msapplication-square150x150logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-150x150.png"/><meta name="msapplication-wide310x150logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-310x150.png"/><meta name="msapplication-square310x310logo" content="https://resources.jetbrains.com/storage/ui/favicons/mstile-310x310.png"/>  <meta name="image" content=""><!-- Open Graph --><meta property="og:title" content="Hust: A Python Tool for the Hust Platform | Hust Login"/><meta property="og:description" content=""/><meta property="og:image" content=""/><meta property="og:site_name" content="Hust Login Help"/><meta property="og:type" content="website"/><meta property="og:locale" content="en_US"/><meta property="og:url" content="empty.html"/><!-- End Open Graph --><!-- Twitter Card --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:site" content=""><meta name="twitter:title" content="Hust: A Python Tool for the Hust Platform | Hust Login"><meta name="twitter:description" content=""><meta name="twitter:creator" content=""><meta name="twitter:image:src" content=""><!-- End Twitter Card --><!-- Schema.org WebPage --><script type="application/ld+json"> { "@context": "http://schema.org", "@type": "WebPage", "@id": "empty.html#webpage", "url": "empty.html", "name": "Hust: A Python Tool for the Hust Platform | Hust Login", "description": "", "image": "", "inLanguage":"en-US" }</script><!-- End Schema.org --><!-- Schema.org WebSite --><script type="application/ld+json"> { "@type": "WebSite", "@id": "/#website", "url": "/", "name": "Hust Login Help" }</script><!-- End Schema.org --> <!-- Mermaid light/dark themes -->  <link rel="stylesheet" type="text/css" href="mermaid.css">  </head>     <body data-id="Empty" data-main-title="Hust: A Python Tool for the Hust Platform" data-article-props="{&quot;seeAlsoStyle&quot;:&quot;links&quot;}"  data-template="article"  data-breadcrumbs=""  >   <div class="wrapper"><main class="panel _main"><header class="panel__header"><div class="container"><h3>Hust Login  Help</h3><div class="panel-trigger"></div></div></header><section class="panel__content"><div class="container"><article class="article" data-shortcut-switcher="inactive"><h1 data-toc="Empty"  id="Empty.topic"  >Hust: A Python Tool for the Hust Platform</h1>  <p id="e699b73_403">This repository contains a Python tool for interacting with the Hust platform. It includes functionalities such as logging in, scheduling courses, selecting badminton courts, topping up school cards, and more.</p><section class="chapter"><h2 id="table-of-contents" data-toc="table-of-contents">Table of Contents</h2><ul class="list _ul" id="e699b73_404"    ><li class="list__item" id="e699b73_405"><p><a href="#dependencies" id="e699b73_406" data-tooltip="Install the required Python packages with pip:"  >Dependencies</a></p></li><li class="list__item" id="e699b73_407"><p><a href="#usage" id="e699b73_408" data-tooltip="Use the LoginSession class to log in to the Hust platform and get a user session."  >Usage</a></p><ul class="list _ul" id="e699b73_409"    ><li class="list__item" id="e699b73_410"><p><a href="#logging-in" id="e699b73_411" data-tooltip="Use the LoginSession class to log in to the Hust platform and get a user session."  >Logging In</a></p></li><li class="list__item" id="e699b73_412"><p><a href="#course-schedule" id="e699b73_413" data-tooltip="Get the user's course schedule in JSON format."  >Course Schedule</a></p></li><li class="list__item" id="e699b73_414"><p><a href="#course-score" id="e699b73_415" data-tooltip="Get the user's course score in JSON format."  >Course Score</a></p></li><li class="list__item" id="e699b73_416"><p><a href="#automating-professional-course-selection" id="e699b73_417" data-tooltip="Automate the process of selecting a course. This is significantly faster than manual selection."  >Automating Professional Course Selection</a></p></li><li class="list__item" id="e699b73_418"><p><a href="#automating-badminton-court-selection" id="e699b73_419" data-tooltip="Automate the process of selecting a badminton court. This is significantly faster than manual selection. Partner is optional, if you want to specify your friend, you can add the partner info in the list in [&quot;password&quot;, &quot;name&quot;, &quot;schoolId&quot;] format or the&hellip;"  >Automating Badminton Court Selection</a></p></li><li class="list__item" id="e699b73_420"><p><a href="#professional-course-credit" id="e699b73_421" data-tooltip="Get the user's professional course credit."  >Professional Course Credit</a></p></li><li class="list__item" id="e699b73_422"><p><a href="#automating-public-course-selection" id="e699b73_423" data-tooltip="Automate the process of selecting a public course. This is significantly faster than manual selection."  >Automating Public Course Selection</a></p></li></ul></li></ul></section><section class="chapter"><h2 id="dependencies" data-toc="dependencies">Dependencies</h2><section class="chapter"><h3 id="python-dependencies" data-toc="python-dependencies">Python Dependencies</h3><p id="e699b73_424">Install the required Python packages with pip:</p><div class="code-block" data-lang="bash"         >
-                pip install -r requirements.txt
-            </div></section><section class="chapter"><h3 id="ocr-dependencies" data-toc="ocr-dependencies">OCR Dependencies</h3><p id="e699b73_426">install <a href="https://github.com/tesseract-ocr/tesseract" id="e699b73_427"   data-external="true" rel="noopener noreferrer" >tesseract</a> and add it to the environment variable.</p></section></section><section class="chapter"><h2 id="usage" data-toc="usage">Usage</h2><section class="chapter"><h3 id="logging-in" data-toc="logging-in">Logging In</h3><p id="e699b73_428">Use the LoginSession class to log in to the Hust platform and get a user session.</p><div class="code-block" data-lang="python"         >
-                from LoginSession import LoginSession
+<!DOCTYPE html SYSTEM "about:legacy-compat">
+<html lang="en-US" data-colors-preset="contrast" data-primary-color="#307FFF">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <meta name="robots" content="noindex">
+    <meta name="built-on" content="2023-11-29T09:21:13.5742063">
+    <meta name="build-number" content="${buildNumber}">
+    <title>Hust: A Python Tool for the Hust Platform | Hust Login</title>
+    <script id="virtual-toc-data" type="application/json">[
+        {
+            "id": "table-of-contents",
+            "level": 0,
+            "title": "Table of Contents",
+            "anchor": "#table-of-contents"
+        },
+        {
+            "id": "dependencies",
+            "level": 0,
+            "title": "Dependencies",
+            "anchor": "#dependencies"
+        },
+        {
+            "id": "usage",
+            "level": 0,
+            "title": "Usage",
+            "anchor": "#usage"
+        }
+    ]</script>
+    <script id="topic-shortcuts" type="application/json"></script>
+    <link href="https://resources.jetbrains.com/writerside/apidoc/6.1.5-b176/app.css" rel="stylesheet">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://jetbrains.com/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://jetbrains.com/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://jetbrains.com/favicon-16x16.png">
+    <link rel="manifest" href="https://jetbrains.com/site.webmanifest">
+    <link rel="mask-icon" href="https://jetbrains.com/safari-pinned-tab.svg" color="#000000">
+    <meta name="msapplication-TileColor" content="#000000"/>
+    <meta name="msapplication-TileImage"
+          content="https://resources.jetbrains.com/storage/ui/favicons/mstile-144x144.png"/>
+    <meta name="msapplication-square70x70logo"
+          content="https://resources.jetbrains.com/storage/ui/favicons/mstile-70x70.png"/>
+    <meta name="msapplication-square150x150logo"
+          content="https://resources.jetbrains.com/storage/ui/favicons/mstile-150x150.png"/>
+    <meta name="msapplication-wide310x150logo"
+          content="https://resources.jetbrains.com/storage/ui/favicons/mstile-310x150.png"/>
+    <meta name="msapplication-square310x310logo"
+          content="https://resources.jetbrains.com/storage/ui/favicons/mstile-310x310.png"/>
+    <meta name="image" content=""><!-- Open Graph -->
+    <meta property="og:title" content="Hust: A Python Tool for the Hust Platform | Hust Login"/>
+    <meta property="og:description" content=""/>
+    <meta property="og:image" content=""/>
+    <meta property="og:site_name" content="Hust Login Help"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:locale" content="en_US"/>
+    <meta property="og:url" content="empty.html"/><!-- End Open Graph --><!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="">
+    <meta name="twitter:title" content="Hust: A Python Tool for the Hust Platform | Hust Login">
+    <meta name="twitter:description" content="">
+    <meta name="twitter:creator" content="">
+    <meta name="twitter:image:src" content=""><!-- End Twitter Card --><!-- Schema.org WebPage -->
+    <script type="application/ld+json"> {
+        "@context": "http://schema.org",
+        "@type": "WebPage",
+        "@id": "empty.html#webpage",
+        "url": "empty.html",
+        "name": "Hust: A Python Tool for the Hust Platform | Hust Login",
+        "description": "",
+        "image": "",
+        "inLanguage": "en-US"
+    }</script><!-- End Schema.org --><!-- Schema.org WebSite -->
+    <script type="application/ld+json"> {
+        "@type": "WebSite",
+        "@id": "/#website",
+        "url": "/",
+        "name": "Hust Login Help"
+    }</script><!-- End Schema.org --> <!-- Mermaid light/dark themes -->
+    <link rel="stylesheet" type="text/css" href="mermaid.css">
+</head>
+<body data-id="Empty" data-main-title="Hust: A Python Tool for the Hust Platform"
+      data-article-props="{&quot;seeAlsoStyle&quot;:&quot;links&quot;}" data-template="article" data-breadcrumbs="">
+<div class="wrapper">
+    <main class="panel _main">
+        <header class="panel__header">
+            <div class="container"><h3>Hust Login Help</h3>
+                <div class="panel-trigger"></div>
+            </div>
+        </header>
+        <section class="panel__content">
+            <div class="container">
+                <article class="article" data-shortcut-switcher="inactive"><h1 data-toc="Empty" id="Empty.topic">Hust: A
+                    Python Tool for the Hust Platform</h1>
+                    <p id="e699b73_403">This repository contains a Python tool for interacting with the Hust platform.
+                        It includes functionalities such as logging in, scheduling courses, selecting badminton courts,
+                        topping up school cards, and more.</p>
+                    <section class="chapter"><h2 id="table-of-contents" data-toc="table-of-contents">Table of
+                        Contents</h2>
+                        <ul class="list _ul" id="e699b73_404">
+                            <li class="list__item" id="e699b73_405"><p><a href="#dependencies" id="e699b73_406"
+                                                                          data-tooltip="Install the required Python packages with pip:">Dependencies</a>
+                            </p></li>
+                            <li class="list__item" id="e699b73_407"><p><a href="#usage" id="e699b73_408"
+                                                                          data-tooltip="Use the LoginSession class to log in to the Hust platform and get a user session.">Usage</a>
+                            </p>
+                                <ul class="list _ul" id="e699b73_409">
+                                    <li class="list__item" id="e699b73_410"><p><a href="#logging-in" id="e699b73_411"
+                                                                                  data-tooltip="Use the LoginSession class to log in to the Hust platform and get a user session.">Logging
+                                        In</a></p></li>
+                                    <li class="list__item" id="e699b73_412"><p><a href="#course-schedule"
+                                                                                  id="e699b73_413"
+                                                                                  data-tooltip="Get the user's course schedule in JSON format.">Course
+                                        Schedule</a></p></li>
+                                    <li class="list__item" id="e699b73_414"><p><a href="#course-score" id="e699b73_415"
+                                                                                  data-tooltip="Get the user's course score in JSON format.">Course
+                                        Score</a></p></li>
+                                    <li class="list__item" id="e699b73_416"><p><a
+                                            href="#automating-professional-course-selection" id="e699b73_417"
+                                            data-tooltip="Automate the process of selecting a course. This is significantly faster than manual selection.">Automating
+                                        Professional Course Selection</a></p></li>
+                                    <li class="list__item" id="e699b73_418"><p><a
+                                            href="#automating-badminton-court-selection" id="e699b73_419"
+                                            data-tooltip="Automate the process of selecting a badminton court. This is significantly faster than manual selection. Partner is optional, if you want to specify your friend, you can add the partner info in the list in [&quot;password&quot;, &quot;name&quot;, &quot;schoolId&quot;] format or the&hellip;">Automating
+                                        Badminton Court Selection</a></p></li>
+                                    <li class="list__item" id="e699b73_420"><p><a href="#professional-course-credit"
+                                                                                  id="e699b73_421"
+                                                                                  data-tooltip="Get the user's professional course credit.">Professional
+                                        Course Credit</a></p></li>
+                                    <li class="list__item" id="e699b73_422"><p><a
+                                            href="#automating-public-course-selection" id="e699b73_423"
+                                            data-tooltip="Automate the process of selecting a public course. This is significantly faster than manual selection.">Automating
+                                        Public Course Selection</a></p></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </section>
+                    <section class="chapter"><h2 id="dependencies" data-toc="dependencies">Dependencies</h2>
+                        <section class="chapter"><h3 id="python-dependencies" data-toc="python-dependencies">Python
+                            Dependencies</h3>
+                            <p id="e699b73_424">Install the required Python packages with pip:</p>
+                            <div class="code-block" data-lang="bash">
+                                pip install -r requirements.txt
+                            </div>
+                        </section>
+                        <section class="chapter"><h3 id="ocr-dependencies" data-toc="ocr-dependencies">OCR
+                            Dependencies</h3>
+                            <p id="e699b73_426">install <a href="https://github.com/tesseract-ocr/tesseract"
+                                                           id="e699b73_427" data-external="true"
+                                                           rel="noopener noreferrer">tesseract</a> and add it to the
+                                environment variable.</p></section>
+                    </section>
+                    <section class="chapter"><h2 id="usage" data-toc="usage">Usage</h2>
+                        <section class="chapter"><h3 id="logging-in" data-toc="logging-in">Logging In</h3>
+                            <p id="e699b73_428">Use the LoginSession class to log in to the Hust platform and get a user
+                                session.</p>
+                            <div class="code-block" data-lang="python">
+                                from LoginSession import LoginSession
 
-                userId = &quot;xxx&quot;
-                password = &quot;xxx&quot;
-                session = LoginSession(userId=userId, password=password)
-            </div><p id="e699b73_430">Use the Operator class to perform operations on the Hust platform.</p><div class="code-block" data-lang="python"         >
-                from operate import operator
+                                userId = &quot;xxx&quot;
+                                password = &quot;xxx&quot;
+                                session = LoginSession(userId=userId, password=password)
+                            </div>
+                            <p id="e699b73_430">Use the Operator class to perform operations on the Hust platform.</p>
+                            <div class="code-block" data-lang="python">
+                                from operate import operator
 
-                operation = operator(session, userId)
-            </div></section><section class="chapter"><h3 id="course-schedule" data-toc="course-schedule">Course Schedule</h3><p id="e699b73_432">Get the user's course schedule in JSON format.</p><div class="code-block" data-lang="python"         >
-                course_info = operation.schedule() # course_info is a json object contains the course schedule of the
-                user.
-            </div></section><section class="chapter"><h3 id="course-score" data-toc="course-score">Course Score</h3><p id="e699b73_434">Get the user's course score in JSON format.</p><div class="code-block" data-lang="python"         >
-                course_score = operation.transcript() # course_score is a json object contains the course score of the
-                user.
-            </div></section><section class="chapter"><h3 id="automating-professional-course-selection" data-toc="automating-professional-course-selection">Automating Professional Course Selection</h3><p id="e699b73_436">Automate the process of selecting a course. This is significantly faster than manual selection.</p><div class="code-block" data-lang="python"         >
-                operation.course({&quot;图神经网络&quot;: &quot;万瑶&quot;}, &quot;09/20/18/00&quot;, &quot;Attack&quot;)
-            </div></section><section class="chapter"><h3 id="automating-badminton-court-selection" data-toc="automating-badminton-court-selection">Automating Badminton Court Selection</h3><p id="e699b73_438">Automate the process of selecting a badminton court. This is significantly faster than manual selection. Partner is optional, if you want to specify your friend, you can add the partner info in the list in [&quot;password&quot;, &quot;name&quot;, &quot;schoolId&quot;] format or the script will choose your first partner you have set before.</p><div class="code-block" data-lang="python"         >
-                operation.badminton(&quot;2021-09-20&quot;, &quot;08&quot;, 1, partner=[&quot;password&quot;, &quot;name&quot;,
-                &quot;schoolId&quot;])
-                operation.badminton(&quot;2021-09-20&quot;, &quot;08&quot;, 1)
-                # both can work well
-            </div></section><section class="chapter"><h3 id="professional-course-credit" data-toc="professional-course-credit">Professional Course Credit</h3><p id="e699b73_440">Get the user's professional course credit.</p><div class="code-block" data-lang="python"         >
-                course_credit = operation.professional_credit()
-            </div></section><section class="chapter"><h3 id="automating-public-course-selection" data-toc="automating-public-course-selection">Automating Public Course Selection</h3><p id="e699b73_442">Automate the process of selecting a public course. This is significantly faster than manual selection.</p><div class="code-block" data-lang="python"         >
-                operation.public_course([&quot;节奏世界&quot;])
-            </div></section></section><div class="last-modified"> Last modified: 29 十一月 2023</div><div data-feedback-placeholder="true"></div><div class="navigation-links _bottom">   <a class="navigation-links__next" href="chinese-version.html">Hust: 一个用于Hust平台的Python工具</a>  </div></article><div id="disqus_thread"></div></div></section></main></div>  <script src="https://resources.jetbrains.com/writerside/apidoc/6.1.5-b176/app.js"></script></body></html>
+                                operation = operator(session, userId)
+                            </div>
+                        </section>
+                        <section class="chapter"><h3 id="course-schedule" data-toc="course-schedule">Course
+                            Schedule</h3>
+                            <p id="e699b73_432">Get the user's course schedule in JSON format.</p>
+                            <div class="code-block" data-lang="python">
+                                course_info = operation.get_schedule() # course_info is a json object contains the
+                                course schedule of the
+                                user.
+                            </div>
+                        </section>
+                        <section class="chapter"><h3 id="course-score" data-toc="course-score">Course Score</h3>
+                            <p id="e699b73_434">Get the user's course score in JSON format.</p>
+                            <div class="code-block" data-lang="python">
+                                course_score = operation.transcript() # course_score is a json object contains the
+                                course score of the
+                                user.
+                            </div>
+                        </section>
+                        <section class="chapter"><h3 id="automating-professional-course-selection"
+                                                     data-toc="automating-professional-course-selection">Automating
+                            Professional Course Selection</h3>
+                            <p id="e699b73_436">Automate the process of selecting a course. This is significantly faster
+                                than manual selection.</p>
+                            <div class="code-block" data-lang="python">
+                                operation.course({&quot;图神经网络&quot;: &quot;万瑶&quot;}, &quot;09/20/18/00&quot;,
+                                &quot;Attack&quot;)
+                            </div>
+                        </section>
+                        <section class="chapter"><h3 id="automating-badminton-court-selection"
+                                                     data-toc="automating-badminton-court-selection">Automating
+                            Badminton Court Selection</h3>
+                            <p id="e699b73_438">Automate the process of selecting a badminton court. This is
+                                significantly faster than manual selection. Partner is optional, if you want to specify
+                                your friend, you can add the partner info in the list in [&quot;password&quot;, &quot;name&quot;,
+                                &quot;schoolId&quot;] format or the script will choose your first partner you have set
+                                before.</p>
+                            <div class="code-block" data-lang="python">
+                                operation.badminton(&quot;2021-09-20&quot;, &quot;08&quot;, 1, partner=[&quot;password&quot;,
+                                &quot;name&quot;,
+                                &quot;schoolId&quot;])
+                                operation.badminton(&quot;2021-09-20&quot;, &quot;08&quot;, 1)
+                                # both can work well
+                            </div>
+                        </section>
+                        <section class="chapter"><h3 id="professional-course-credit"
+                                                     data-toc="professional-course-credit">Professional Course
+                            Credit</h3>
+                            <p id="e699b73_440">Get the user's professional course credit.</p>
+                            <div class="code-block" data-lang="python">
+                                course_credit = operation.professional_credit()
+                                detail = course_credit.course_details()
+                                total = course_credit.total_credit()
+                            </div>
+                        </section>
+                        <section class="chapter"><h3 id="automating-public-course-selection"
+                                                     data-toc="automating-public-course-selection">Automating Public
+                            Course Selection</h3>
+                            <p id="e699b73_442">Automate the process of selecting a public course. This is significantly
+                                faster than manual selection.</p>
+                            <div class="code-block" data-lang="python">
+                                operation.public_course([&quot;节奏世界&quot;])
+                            </div>
+                        </section>
+                    </section>
+                    <div class="last-modified"> Last modified: 29 十一月 2023</div>
+                    <div data-feedback-placeholder="true"></div>
+                    <div class="navigation-links _bottom"><a class="navigation-links__next" href="chinese-version.html">Hust:
+                        一个用于Hust平台的Python工具</a></div>
+                </article>
+                <div id="disqus_thread"></div>
+            </div>
+        </section>
+    </main>
+</div>
+<script src="https://resources.jetbrains.com/writerside/apidoc/6.1.5-b176/app.js"></script>
+</body>
+</html>
