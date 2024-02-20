@@ -1,14 +1,15 @@
-from PIL import Image
-from pytesseract import image_to_string
+import io
+
 from PIL import Image, ImageSequence
+from pytesseract import image_to_string
 
 
-def deCaptcha(imageContent):
+def deCaptcha(imageContent: bytes):
     # 打开图像文件
-    img = Image.open(imageContent)
+    img = Image.open(io.BytesIO(imageContent))
 
     # 检查图像是否是动态GIF
-    if img.format == 'GIF' and img.is_animated:
+    if img.format == 'GIF':
         img_list = [frame.copy().convert('L') for frame in ImageSequence.Iterator(img)]
     else:
         img_list = [img.copy().convert('L')]

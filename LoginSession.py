@@ -3,8 +3,7 @@ import time
 from random import random
 
 import fake_useragent
-import requests
-from requests.structures import CaseInsensitiveDict
+import httpx
 
 from util import captcha
 from util.rsaEncoder import RsaEncoder
@@ -12,29 +11,31 @@ from util.rsaEncoder import RsaEncoder
 user_agent = fake_useragent.UserAgent().chrome
 
 
-class LoginSession(requests.Session):
+class LoginSession(httpx.Client):
     def __init__(self, userId, password):
         super().__init__()
         self.url = "https://one.hust.edu.cn/dcp/"
         self.password = password
         self.userId = userId
-        self.headers = CaseInsensitiveDict({"User-Agent": user_agent})
-        self.Login()
+        self.headers.update({"User-Agent": user_agent})
+        self.follow_redirects = True
+        self.login()
 
     def get_code(self):
-        captchaContent = self.get("https://pass.hust.edu.cn/cas/code?" + str(random()), stream=True)
-        captchaContent.raw.decode_content = True
-        return captcha.deCaptcha(captchaContent.raw)
+        # 获取验证码
+        url = "https://pass.hust.edu.cn/cas/code?" + str(random())
+        captchaContent = self.get(url)
+        return captcha.deCaptcha(captchaContent.content)
 
     def get_rsa(self):
         rsa = self.post("https://pass.hust.edu.cn/cas/rsa").json()
-        return RsaEncoder(self.userId, self.password, rsa['publicKey']).encode()
+        return RsaEncoder(self.userId, self.password, rsa["publicKey"]).encode()
 
     def get_lt(self):
         res = self.get(self.url)
         return re.search('<input type="hidden" id="lt" name="lt" value="(.*)" />', res.text).group(1)
 
-    def Login(self):
+    def login(self):
         cnt = 0
         try:
             lt = self.get_lt()
@@ -49,11 +50,14 @@ class LoginSession(requests.Session):
                 "execution": "e1s1",
                 "_eventId": "submit",
             }
-            self.post("https://pass.hust.edu.cn/cas/login?service=http://one.hust.edu.cn/dcp/index.jsp",
-                      data=post_params)
+            self.post(
+                "https://pass.hust.edu.cn/cas/login?service=http://one.hust.edu.cn/dcp/index.jsp",
+                data=post_params,
+            )
             print("Login success!")
-        except:
+        except Exception as e:
+            print(e)
             time.sleep(5)
             cnt += 1
             print("Login failed, retrying...", cnt)
-            self.Login()
+            self.login()

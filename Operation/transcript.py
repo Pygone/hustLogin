@@ -11,7 +11,7 @@ class Transcript:
         self.required_courses = None
         self.url = self.login_session.post(
             "https://pass.hust.edu.cn/cas/login?service=https://cjd.hust.edu.cn/bks/",
-            allow_redirects=False,
+            follow_redirects=False,
         ).headers["Location"]
         self.query = query
         self.get_data()

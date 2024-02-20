@@ -16,6 +16,19 @@ logging.basicConfig(
 
 
 async def execute_script(session, text):
+    """
+    Executes a script by sending a POST request to the specified URL with the provided data.
+
+    Args:
+        session (aiohttp.ClientSession): The client session used to send the request.
+        text (str): The text containing the data to be extracted and sent in the request.
+
+    Raises:
+        AssertionError: If the response status is not 200.
+
+    Returns:
+        None
+    """
     pattern = re.compile(r'name="(.*)" value="(.*)"/?>')
     resp = pattern.findall(text)
     data = {}
@@ -69,7 +82,6 @@ async def get_course(session) -> Any | None:
     async with session.post(
             url="http://wsxk.hust.edu.cn/zyxxk/Stuxk/getXsFaFZkc",
             data=data,
-            allow_redirects=False,
     ) as response:
         assert response.status == 200
         resp = await response.json()

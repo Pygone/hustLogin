@@ -16,8 +16,8 @@ class Operator:
         self.login_session = login_session
 
     def course(self, course: dict, time_: str = ""):
-        self.login_session.get(
-            "http://wsxk.hust.edu.cn/hustpass_2.jsp", allow_redirects=True
+        resp = self.login_session.get(
+            "http://wsxk.hust.edu.cn/hustpass_2.jsp"
         )
         # 获取cookies 中的JSESSIONID
         cookies = self.login_session.cookies

@@ -57,7 +57,7 @@ class Badminton:
         yesterday = date - datetime.timedelta(days=1)
         end_time = (datetime.datetime.strptime(self.start_time, "%H:%M:%S") + datetime.timedelta(hours=2)).strftime(
             "%H:%M:%S")
-        self.login_session.headers["Referer"] = self.login_session.get("http://pecg.hust.edu.cn/cggl/index1").url
+        self.login_session.headers["Referer"] = str(self.login_session.get("http://pecg.hust.edu.cn/cggl/index1").url)
         url = f"http://pecg.hust.edu.cn/cggl/front/syqk?date={yesterday.strftime('%Y-%m-%d')}&type=1&cdbh=45"
         text = self.login_session.get(url).text
         self.cg_csrf_token = re.search('name="cg_csrf_token" value="(.*)" />', text).group(1)
@@ -78,7 +78,7 @@ class Badminton:
         date = time.mktime(time.strptime(date, "%Y-%m-%d %H:%M:%S"))
         while time.time() - date < 0:
             time.sleep(1)
-        text = self.login_session.post("http://pecg.hust.edu.cn/cggl/front/step2", data=params).text
+        text = self.login_session.post("http://pecg.hust.edu.cn/cggl/front/step2", params=params).text
         try:
             data = re.search('name="data" value="(.*)" type', text).group(1)
             Id = re.search('name="id" value="(.*)" type', text).group(1)
@@ -88,7 +88,7 @@ class Badminton:
                 ("cg_csrf_token", self.cg_csrf_token),
                 ("select_pay_type", -1),
             ]
-            text = self.login_session.post("http://pecg.hust.edu.cn/cggl/front/step3", data=params).text
+            text = self.login_session.post("http://pecg.hust.edu.cn/cggl/front/step3", params=params).text
         except AttributeError:
             return re.search(r"alert\(HTMLDecode\('(.*)'\), '提示信息'\);", text).group(1)
         return re.search(r"alert\(HTMLDecode\('(.*)'\), '提示信息'\);", text).group(1)
