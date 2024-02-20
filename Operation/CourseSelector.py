@@ -38,6 +38,19 @@ async def execute_script(session, text):
         assert resp.status == 200
 
 
+async def post_request(session, course, value):
+    async with session.post(
+        url="http://wsxk.hust.edu.cn/zyxxk/Stuxk/addStuxkIsxphx",
+        data=value,
+    ) as response:
+        assert response.status == 200
+        json = await response.json()
+        if json["code"] == 0:
+            print(f"{course} 选课成功")
+        else:
+            print(f"{course} 选课失败")
+
+
 async def post_requests(session, datas):
     """
     Sends enrollment requests for the specified courses.
@@ -49,17 +62,8 @@ async def post_requests(session, datas):
     Returns:
     - None
     """
-    for course, value in datas:
-        async with session.post(
-                url="http://wsxk.hust.edu.cn/zyxxk/Stuxk/addStuxkIsxphx",
-                data=value,
-        ) as response:
-            assert response.status == 200
-            json = await response.json()
-            if json["code"] == 0:
-                print(f"{course} 选课成功")
-            else:
-                print(f"{course} 选课失败")
+    tasks = [post_request(session, course, value) for course, value in datas.items()]
+    await asyncio.gather(*tasks)
 
 
 async def get_course(session) -> Any | None:
@@ -73,15 +77,15 @@ async def get_course(session) -> Any | None:
     - dict: A dictionary containing the retrieved courses.
     """
     async with session.get(
-            "http://wsxk.hust.edu.cn/xklogin.jsp?url=http://wsxk.hust.edu.cn/zyxxk/nlogin"
+        "http://wsxk.hust.edu.cn/xklogin.jsp?url=http://wsxk.hust.edu.cn/zyxxk/nlogin"
     ) as response:
         assert response.status == 200
         text = await response.text()  # this is a script
         await execute_script(session, text)
     data = {"page": 1, "limit": 10, "fzxkfs": "", "xkgz": 1}
     async with session.post(
-            url="http://wsxk.hust.edu.cn/zyxxk/Stuxk/getXsFaFZkc",
-            data=data,
+        url="http://wsxk.hust.edu.cn/zyxxk/Stuxk/getXsFaFZkc",
+        data=data,
     ) as response:
         assert response.status == 200
         resp = await response.json()
@@ -140,6 +144,25 @@ class CourseSelector:
                     result[key] = {"ID": ID, "KCBH": KCBH, "FZID": FZID}
         return result
 
+    async def get_course_data(self, session, course, value):
+        data = {
+            "page": 1,
+            "limit": 10,
+            "fzid": value["FZID"],
+            "kcbh": value["KCBH"],
+            "sfid": self.userId,
+            "faid": value["ID"],
+            "id": value["ID"],
+        }
+        return course, {
+            "ktbh": await self.get_class_id(session, data, course),
+            "xqh": self.XQH,
+            "kcbh": value["KCBH"],
+            "fzid": value["FZID"],
+            "faid": value["ID"],
+            "sfid": self.userId,
+        }
+
     async def get_class_ids(self, session, request_dict: dict) -> dict:
         """
         Retrieves the class IDs for the specified courses.
@@ -151,26 +174,12 @@ class CourseSelector:
         Returns:
         - dict: A dictionary containing the class IDs for the specified courses.
         """
-        result = {}
-        for course, value in request_dict.items():
-            data = {
-                "page": 1,
-                "limit": 10,
-                "fzid": value["FZID"],
-                "kcbh": value["KCBH"],
-                "sfid": self.userId,
-                "faid": value["ID"],
-                "id": value["ID"],
-            }
-            result[course] = {
-                "ktbh": await self.get_class_id(session, data, course),
-                "xqh": self.XQH,
-                "kcbh": value["KCBH"],
-                "fzid": value["FZID"],
-                "faid": value["ID"],
-                "sfid": self.userId,
-            }
-        return result
+        tasks = [
+            self.get_course_data(session, course, value)
+            for course, value in request_dict.items()
+        ]
+        results = await asyncio.gather(*tasks)
+        return {course: data for course, data in results}
 
     async def get_class_id(self, session, data, course):
         """
@@ -185,8 +194,8 @@ class CourseSelector:
         - str: The class ID for the specified course.
         """
         async with session.post(
-                url="http://wsxk.hust.edu.cn/zyxxk/Stuxk/getFzkt",
-                data=data,
+            url="http://wsxk.hust.edu.cn/zyxxk/Stuxk/getFzkt",
+            data=data,
         ) as response:
             assert response.status == 200
             json = await response.json()
