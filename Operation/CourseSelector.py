@@ -39,6 +39,20 @@ async def execute_script(session, text):
 
 
 async def post_request(session, course, value):
+    """
+    发送POST请求进行选课操作。
+
+    Args:
+        session (aiohttp.ClientSession): 异步HTTP会话对象。
+        course (str): 课程名称。
+        value (dict): 请求参数。
+
+    Raises:
+        AssertionError: 如果响应状态码不为200。
+
+    Returns:
+        None
+    """
     async with session.post(
         url="http://wsxk.hust.edu.cn/zyxxk/Stuxk/addStuxkIsxphx",
         data=value,
@@ -66,6 +80,29 @@ async def post_requests(session, datas):
     await asyncio.gather(*tasks)
 
 
+async def update_session(session):
+    """
+    更新会话信息。
+
+    参数：
+    - session：会话对象
+
+    异步发送GET请求到指定URL，获取响应文本，并执行脚本。
+
+    抛出：
+    - AssertionError：如果响应状态码不为200
+
+    返回：
+    - 无
+    """
+    async with session.get(
+        "http://wsxk.hust.edu.cn/xklogin.jsp?url=http://wsxk.hust.edu.cn/zyxxk/nlogin"
+    ) as response:
+        assert response.status == 200
+        text = await response.text()  # this is a script
+        await execute_script(session, text)
+
+
 async def get_course(session) -> Any | None:
     """
     Retrieves the available courses from the server.
@@ -76,17 +113,15 @@ async def get_course(session) -> Any | None:
     Returns:
     - dict: A dictionary containing the retrieved courses.
     """
-    async with session.get(
-        "http://wsxk.hust.edu.cn/xklogin.jsp?url=http://wsxk.hust.edu.cn/zyxxk/nlogin"
-    ) as response:
-        assert response.status == 200
-        text = await response.text()  # this is a script
-        await execute_script(session, text)
     data = {"page": 1, "limit": 10, "fzxkfs": "", "xkgz": 1}
     async with session.post(
         url="http://wsxk.hust.edu.cn/zyxxk/Stuxk/getXsFaFZkc",
         data=data,
+        allow_redirects=False,
     ) as response:
+        if response.status != 200:
+            await update_session(session)
+            return await get_course(session)
         assert response.status == 200
         resp = await response.json()
         if resp["count"] == 0:
