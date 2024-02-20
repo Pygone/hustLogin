@@ -35,6 +35,7 @@ class LoginSession(requests.Session):
         return re.search('<input type="hidden" id="lt" name="lt" value="(.*)" />', res.text).group(1)
 
     def Login(self):
+        cnt = 0
         try:
             lt = self.get_lt()
             code = self.get_code()
@@ -52,5 +53,7 @@ class LoginSession(requests.Session):
                       data=post_params)
             print("Login success!")
         except:
-            time.sleep(1)
+            time.sleep(5)
+            cnt += 1
+            print("Login failed, retrying...", cnt)
             self.Login()
