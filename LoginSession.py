@@ -1,3 +1,4 @@
+import logging
 import re
 import time
 from random import random
@@ -9,17 +10,19 @@ from util import captcha
 from util.rsaEncoder import RsaEncoder
 
 user_agent = fake_useragent.UserAgent().chrome
-
+logging.basicConfig(level=logging.WARN, format="%(asctime)s - %(levelname)s - %(message)s")
 
 class LoginSession(httpx.Client):
     def __init__(self, userId, password):
         super().__init__()
+
         self.url = "https://one.hust.edu.cn/dcp/"
         self.password = password
         self.userId = userId
         self.headers.update({"User-Agent": user_agent})
         self.follow_redirects = True
         self.login()
+        self.logger = None
 
     def get_code(self):
         # 获取验证码
