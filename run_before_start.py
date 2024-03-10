@@ -4,7 +4,7 @@ import json
 import asyncio
 
 
-async def post_request(value: dict, XQH: str, courseNum: int):
+async def post_requests(value: dict, XQH: str, courseNum: int, url: str):
     async with aiohttp.ClientSession() as session:
         session.cookie_jar.update_cookies(cookies)
         datas = {
@@ -16,26 +16,44 @@ async def post_request(value: dict, XQH: str, courseNum: int):
             "sfid": userId,
         }
         async with session.post(
-                url="http://wsxk.hust.edu.cn/zyxxk/Stuxk/addStuxkIsxphx",
-                data=datas,
+            url=url,
+            data=datas,
         ) as response:
             try:
                 assert response.status == 200
                 json = await response.json()
-                if json["code"] != 0:
+                if int(json["code"]) != 0:
                     print(f"{json['msg']}")
+                else:
+                    print(f"操作成功!")
             except AssertionError:
                 print(await response.text())
                 return
 
 
-async def main(grade_: int):
-    XQH = getXQH()
+async def select_course(value: dict, XQH: str, courseNum: int):
+    await post_requests(
+        value, XQH, courseNum, "http://wsxk.hust.edu.cn/zyxxk/Stuxk/addStuxkIsxphx"
+    )
+
+
+async def drop_course(value: dict, XQH: str, courseNum: int):
+    await post_requests(
+        value, XQH, courseNum, "http://wsxk.hust.edu.cn/zyxxk/Stuxk/dropStuKt"
+    )
+
+
+async def handler(grade_: int, operation: str):
+    XQH = get_xqh()
     semester = ""
     if XQH[4] == "1":
         semester = "fall"
     else:
         semester = "spring"
+    if operation == "select":
+        func = select_course
+    else:
+        func = drop_course
     datafile = f"src/{grade_}_{semester}_course.json"
     with open(datafile, "r", encoding="utf8") as f:
         datas = json.load(f)
@@ -44,19 +62,28 @@ async def main(grade_: int):
             for item in courses:
                 if name == item[0]:
                     tasks.append(
-                        post_request(
+                        func(
                             {
                                 "ID": course["ID"],
                                 "KCBH": course["KCBH"],
                                 "FZID": course["FZID"],
                             },
-                            XQH, item[1]
+                            XQH,
+                            item[1],
                         )
                     )
     await asyncio.gather(*tasks)
 
 
-def getXQH() -> str:
+async def select(grade_: int):
+    await handler(grade_, "select")
+
+
+async def drop(grade_: int):
+    await handler(grade_, "drop")
+
+
+def get_xqh() -> str:
     # 获取年份XQ
     year = time.localtime().tm_year
     # 获取月份
@@ -81,10 +108,7 @@ if __name__ == "__main__":
     cookies = "Your cookies"
     cookies = dict(i.split("=") for i in cookies.split("; "))
     courses = [
-        ("并行编程原理与实践", 1),
         ("数字图像处理", 1),
-        ("云计算与虚拟化", 1),
-        ("大数据存储系统与管理", 1),
     ]
     Time = "2024/2/27 16:00:00"  # 实际上可以不用等待选课开始, 直接选课
     # wait until the time is up
@@ -92,4 +116,4 @@ if __name__ == "__main__":
     if time.time() < start_time:
         print(f"等待选课开始, 距离选课开始还有{start_time - time.time()}秒")
         time.sleep(start_time - time.time())
-    asyncio.run(main(grade))
+    asyncio.run(handler(grade, "select"))
